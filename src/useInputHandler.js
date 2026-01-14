@@ -1,34 +1,45 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-export const useInputHandler = (acciones) => {
-    useEffect (() => {
-        const handleTeclado = (event) => {
-            //Mapeo de teclas simulando el hardware
+export const useInputHandler = ({ onBigButton, onRed, onBlue, onGreen, onYellow }) => {
+  
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Evita que se repita el evento si dejas la tecla presionada
+      if (e.repeat) return;
 
-            //Botón Grande (Acelerar y Responder primero) -> Barra espaciadora 
-            if (event.code === 'Space') {
-                acciones.onBigButton && acciones.onBigButton();
-            }
+      switch (e.key) {
+        // --- BOTONES GRANDES (BUZZ IN / ACELERAR) ---
+        case ' ': // ESPACIO (Jugador 1)
+          if (onBigButton) onBigButton('p1');
+          break;
+        case 'Enter': // ENTER (Jugador 2)
+          if (onBigButton) onBigButton('p2');
+          break;
 
-            //Botones de colores que representan las opciones 
-            //Número 1 = Rojo (Opción A)
-            if (event.key === '1') acciones.onRed && acciones.onRed();
+        // --- OPCIONES DE RESPUESTA (1, 2, 3, 4) ---
+        case '1':
+          if (onRed) onRed();       // 1 -> Rojo (A)
+          break;
+        case '2':
+          if (onBlue) onBlue();     // 2 -> Azul (B)
+          break;
+        case '3':
+          if (onGreen) onGreen();   // 3 -> Verde (C)   
+          break;
+        case '4':
+          if (onYellow) onYellow(); // 4 -> Amarillo (D)
+          break;
 
-            //Número 2 = Verde (Opción B)
-            if (event.key === '2') acciones.onGreen && acciones.onGreen();
-
-            //Número 3 = Amarillo (Opción C)
-            if (event.key === '3') acciones.onYellow && acciones.onYellow();
-
-            //Número 4 = Azul (Opción D)
-            if (event.key === '4') acciones.onBlue && acciones.onBlue();
-
-        };
-            window.addEventListener('keydown', handleTeclado);
-
-            //Limpieza al desmontar el componente
-            return () => {
-                window.removeEventListener('keydown', handleTeclado);
-            };
-        }, [acciones]);
+        default:
+          break;
+      }
     };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Limpieza al desmontar (importante para que no se dupliquen las acciones)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onBigButton, onRed, onBlue, onGreen, onYellow]);
+};
