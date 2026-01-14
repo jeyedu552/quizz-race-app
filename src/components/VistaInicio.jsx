@@ -3,8 +3,14 @@ import React, { useState } from 'react';
 // Importamos los png
 import batman from '../assets/avatars/batman.png';
 import spiderman from '../assets/avatars/spiderman.png';
+import ariel from '../assets/avatars/ariel.jpg';
+import capitanAmerica from '../assets/avatars/capitanAmerica.png';
+import cenicienta from '../assets/avatars/cenicienta.jpg';
+import rapunzel from '../assets/avatars/rapunzel.jpg';
+import superman from '../assets/avatars/superman.png';
+import wonderwoman from '../assets/avatars/wonderwoman.png';
 
-const AVATARES = [batman, spiderman];
+const AVATARES = [batman, spiderman, superman, capitanAmerica, wonderwoman, cenicienta, rapunzel, ariel];
 
 function VistaInicio({ onIniciar }) {
   const [p1Nombre, setP1Nombre] = useState('');
