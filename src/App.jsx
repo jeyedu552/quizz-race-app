@@ -4,7 +4,6 @@ import { baseDeDatosPreguntas } from './datos'
 import { useInputHandler } from './useInputHandler'
 
 // --- IMPORTAMOS LOS COMPONENTES ---
-// ¡Asegúrate de haber creado el archivo VistaInicio.jsx como te dije antes!
 import VistaInicio from './components/VistaInicio'
 import VistaTrivia from './components/VistaTrivia'
 import VistaCarrera from './components/VistaCarrera'
@@ -12,20 +11,18 @@ import VistaGameOver from './components/VistaGameOver'
 
 function App() {
   // --- ESTADOS GENERALES ---
-  // IMPORTANTE: Empezamos en 'Inicio' para mostrar el formulario primero
   const [fase, setFase] = useState('Inicio'); 
   const [preguntaActual, setPreguntaActual] = useState(null);
   const [ronda, setRonda] = useState(1);
   const [idsUsados, setIdsUsados] = useState([]);
   
-  // --- CONFIGURACIÓN JUGADORES (Nombres y Avatares) ---
-  // Datos por defecto para evitar errores si entras directo a Trivia
+  // --- CONFIGURACIÓN JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
       p1: { nombre: "Jugador 1", avatar: "🤖" },
       p2: { nombre: "Jugador 2", avatar: "👽" }
   });
 
-  // --- ESTADÍSTICAS (Puntos) ---
+  // --- ESTADÍSTICAS ---
   const [stats, setStats] = useState({
     p1: { puntos: 0, aciertos: 0, total_respondidas: 0 },
     p2: { puntos: 0, aciertos: 0, total_respondidas: 0 }
@@ -40,12 +37,12 @@ function App() {
   // Minijuego
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
 
-  // Refs
+  // Refs para métricas
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]); 
   const tiempoInicioRef = useRef(Date.now());
   const timerRef = useRef(null);
 
-  // --- FUNCIÓN DE INICIO (Desde el formulario) ---
+  // --- FUNCIÓN DE INICIO ---
   const iniciarJuego = (datosJugadores) => {
       setInfoJugadores(datosJugadores);
       setFase('Trivia');
@@ -60,18 +57,43 @@ function App() {
      return "NIVEL " + nivelNum;
   };
 
-  // --- 1. LÓGICA DE CARGA DE PREGUNTAS ---
+  // --- 1. LÓGICA DE CARGA DE PREGUNTAS  ---
   const cargarPregunta = async () => {
     let nueva;
     setJugadorActivo(null); 
     setFeedback(null);
     setTimer(30);
 
+    // ============================================================
+    // FASE 1: RONDAS 1-5 (
+    // ============================================================
     if (ronda <= 5) {
-       // Lógica Local Fase 1
+       
+       // -------------------------------------------------------
+       // [BACKEND] BLOQUE COMENTADO 
+       // -------------------------------------------------------
+       /* try {
+           console.log(" Conectando con Backend: Pregunta Fácil...");
+           const respuesta = await fetch('http://127.0.0.1:5000/preguntafacil', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ lista_ids_cache: idsUsados })
+           });
+           const data = await respuesta.json();
+           
+           // Asignamos la pregunta recibida del servidor
+           if (data) nueva = data.pregunta || data; 
+           
+       } catch (error) {
+           console.error("Error conectando al Backend (Fase 1):", error);
+       } 
+       */
+       // -------------------------------------------------------
+
+       // Lógica Local 
        if (!nueva) {
            const disponibles = baseDeDatosPreguntas.filter(p => p.nivel === 1 && !idsUsados.includes(p.id));
-           // Si se acaban las preguntas, reiniciamos el filtro (prevención de crash)
+           // Si se acaban, reiniciamos filtro 
            if (disponibles.length === 0) {
               const reset = baseDeDatosPreguntas.filter(p => p.nivel === 1);
               nueva = reset[Math.floor(Math.random() * reset.length)];
@@ -81,11 +103,49 @@ function App() {
        }
        tiempoInicioRef.current = Date.now();
     } 
+    // ============================================================
+    // FASE 2: RONDAS 6-10 (IA / Adaptativo)
+    // ============================================================
     else {
-       // Lógica Local Fase 2 (Simulada)
+       
+       // -------------------------------------------------------
+       // [BACKEND] BLOQUE COMENTADO 
+       // -------------------------------------------------------
+       /* try {
+           // 1. Calculamos métricas actuales para enviar al modelo
+           const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
+           const promedioTiempos = tiemposRespuesta.length > 0 ? (sumaTiempos / tiemposRespuesta.length) : 5;
+           const mejorPuntaje = Math.max(stats.p1.puntos, stats.p2.puntos);
+
+           const datosParaEnviar = {
+               tiempo_respuesta_seg: promedioTiempos, 
+               aciertos_pct_ult5: (mejorPuntaje / 500) * 100, // Estimado simple
+               ID_seleccionados: idsUsados 
+           };
+
+           console.log("Enviando métricas a la IA:", datosParaEnviar);
+
+           const respuesta = await fetch('http://127.0.0.1:5000/predecir', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(datosParaEnviar)
+           });
+
+           const data = await respuesta.json();
+
+           // Opción A: El backend devuelve la pregunta completa
+           if (data.pregunta) {
+               nueva = data.pregunta;
+           } 
+       } catch (error) {
+           console.error("Error conectando al Backend: ", error);
+       } 
+       */
+       // -------------------------------------------------------
+
+       // Lógica Local 
        if (!nueva) {
            const disponibles = baseDeDatosPreguntas.filter(p => p.nivel === 2 && !idsUsados.includes(p.id));
-           // Prevención de crash si se acaban
            if (disponibles.length === 0) {
               const reset = baseDeDatosPreguntas.filter(p => p.nivel === 2);
               nueva = reset[Math.floor(Math.random() * reset.length)];
@@ -132,7 +192,7 @@ function App() {
 
   // --- 2. LÓGICA DE RESPUESTAS ---
   const presionarBotonGrande = (jugador) => {
-    if (fase === 'Inicio') return; // Bloquear en inicio
+    if (fase === 'Inicio') return; 
 
     if (fase === 'Trivia') {
       if (!jugadorActivo && !feedback) {
@@ -202,16 +262,13 @@ function App() {
   }
 
   if (fase === 'Game_Over') {
-      // AQUÍ PASAMOS infoJugadores
       return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
   }
   
   if (fase === 'Carrera') {
-      // AQUÍ TAMBIÉN
       return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
   }
 
-  // Vista Normal (Trivia)
   return (
     <VistaTrivia 
         pregunta={preguntaActual}
