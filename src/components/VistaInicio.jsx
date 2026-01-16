@@ -22,22 +22,22 @@ function VistaInicio({ onIniciar }) {
   return (
     <div className="inicio-container">
       <h1 className="titulo-juego">🧠 QUIZ RACING 🏎️</h1>
-      
+
       <div className="seleccion-jugadores">
         {/* JUGADOR 1 */}
         <div className="card-jugador p1">
           <h2>JUGADOR 1</h2>
-          <input 
-            type="text" 
-            placeholder="Nombre P1" 
+          <input
+            type="text"
+            placeholder="Nombre P1"
             value={p1Nombre}
             onChange={(e) => setP1Nombre(e.target.value)}
             maxLength={10}
           />
           <div className="grid-avatares">
             {AVATARES.map(av => (
-              <button 
-                key={av} 
+              <button
+                key={av}
                 className={`btn-avatar ${p1Avatar === av ? 'seleccionado' : ''}`}
                 onClick={() => setP1Avatar(av)}
               >
@@ -52,17 +52,17 @@ function VistaInicio({ onIniciar }) {
         {/* JUGADOR 2 */}
         <div className="card-jugador p2">
           <h2>JUGADOR 2</h2>
-          <input 
-            type="text" 
-            placeholder="Nombre P2" 
+          <input
+            type="text"
+            placeholder="Nombre P2"
             value={p2Nombre}
             onChange={(e) => setP2Nombre(e.target.value)}
             maxLength={10}
           />
           <div className="grid-avatares">
             {AVATARES.map(av => (
-              <button 
-                key={av} 
+              <button
+                key={av}
                 className={`btn-avatar ${p2Avatar === av ? 'seleccionado' : ''}`}
                 onClick={() => setP2Avatar(av)}
               >
@@ -80,4 +80,4 @@ function VistaInicio({ onIniciar }) {
   );
 }
 
-export default VistaInicio; 
+export default VistaInicio;

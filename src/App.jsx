@@ -72,12 +72,13 @@ function App() {
        // -------------------------------------------------------
        // [BACKEND] BLOQUE COMENTADO 
        // -------------------------------------------------------
-       /* try {
-           console.log(" Conectando con Backend: Pregunta Fácil...");
-           const respuesta = await fetch('http://127.0.0.1:5000/preguntafacil', {
+       try {
+           console.log("Conectando con Backend: Pregunta Fácil...");
+           const respuesta = await fetch('http://172.29.81.204:5000/preguntafacil', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify({ lista_ids_cache: idsUsados })
+               body: JSON.stringify({ lista_ids_cache: idsUsados }),
+               mode: 'cors'
            });
            const data = await respuesta.json();
            
@@ -86,14 +87,11 @@ function App() {
            
        } catch (error) {
            console.error("Error conectando al Backend (Fase 1):", error);
-       } 
-       */
-       // -------------------------------------------------------
-
-       // Lógica Local 
+       }
+       
+       // Si el backend falla, usar lógica local como fallback
        if (!nueva) {
            const disponibles = baseDeDatosPreguntas.filter(p => p.nivel === 1 && !idsUsados.includes(p.id));
-           // Si se acaban, reiniciamos filtro 
            if (disponibles.length === 0) {
               const reset = baseDeDatosPreguntas.filter(p => p.nivel === 1);
               nueva = reset[Math.floor(Math.random() * reset.length)];
@@ -125,10 +123,11 @@ function App() {
 
            console.log("Enviando métricas a la IA:", datosParaEnviar);
 
-           const respuesta = await fetch('http://127.0.0.1:5000/predecir', {
+           const respuesta = await fetch('http://172.29.81.204:5000/predecir', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify(datosParaEnviar)
+               body: JSON.stringify(datosParaEnviar),
+               mode: 'cors'
            });
 
            const data = await respuesta.json();
@@ -158,7 +157,6 @@ function App() {
     if (nueva) {
       setPreguntaActual(nueva);
       setIdsUsados(prev => [...prev, nueva.id]);
-      tiempoInicioRef.current = Date.now();
 
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
@@ -196,6 +194,7 @@ function App() {
 
     if (fase === 'Trivia') {
       if (!jugadorActivo && !feedback) {
+        tiempoInicioRef.current = Date.now();
         setJugadorActivo(jugador); 
       }
     } else if (fase === 'Carrera') {
@@ -282,4 +281,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
