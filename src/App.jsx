@@ -8,8 +8,7 @@ import VistaInicio from "./components/VistaInicio";
 import VistaTrivia from "./components/VistaTrivia";
 import VistaCarrera from "./components/VistaCarrera";
 import VistaGameOver from "./components/VistaGameOver";
-// Solo importamos lo que ya tienes listo en servicios
-import { fetchPreguntaFacil } from "../src/services/preguntas";
+import { fetchPreguntaFacil, fetchPredecir } from "../src/services/preguntas";
 
 function App() {
   // --- ESTADOS GENERALES ---
