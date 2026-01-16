@@ -40,6 +40,7 @@
     align-items: center; justify-content: center;
     height: 100%; width: 100%;
     animation: fadeIn 0.5s ease;
+    background-color: #FFB42B;
   }
   
   .titulo-juego {
@@ -99,10 +100,51 @@
     transition: transform 0.2s;
   }
   .btn-iniciar:hover { transform: scale(1.05); }
+
+  .btn-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.btn-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.avatar-grande {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  margin: 10px auto 15px;
+  background: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
   
   /* =========================================
      3. ESTILOS TRIVIA (STITCH)
      ========================================= */
+
+  .avatar-hud img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .avatar-turno {
+    width: 30px;
+    height: 30px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+
   .game-container {
     width: 100%; height: 100%; max-width: 1200px;
     margin: 0 auto; display: flex; flex-direction: column;

@@ -14,17 +14,20 @@ function VistaTrivia({
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ''}`}>
 
       {/* --- HUD SUPERIOR --- */}
-      <div className="hud-superior">
-        {/* Panel Jugador 1 */}
+        <div className="hud-superior">
+      {/* Panel Jugador 1 */}
         <div className={`jugador-panel ${jugadorActivo === 'p1' ? 'activo' : ''}`}>
-          <div className="avatar-hud">{jugadores.p1.avatar}</div>
-          <div className="info-hud">
+        <div className="avatar-hud">
+            <img src={jugadores.p1.avatar} alt="avatar jugador 1" />
+        </div>
+        <div className="info-hud">
             <h3>{jugadores.p1.nombre}</h3>
             <div className="metrics">
-              <span>⭐ {stats.p1.puntos}</span>
+            <span>⭐ {stats.p1.puntos}</span>
             </div>
-          </div>
         </div>
+        </div>
+
 
         {/* Centro */}
         <div className="centro-info">
@@ -34,15 +37,17 @@ function VistaTrivia({
 
         {/* Panel Jugador 2 */}
         <div className={`jugador-panel ${jugadorActivo === 'p2' ? 'activo' : ''}`}>
-          <div className="info-hud" style={{ textAlign: 'right' }}>
+        <div className="info-hud" style={{ textAlign: 'right' }}>
             <h3>{jugadores.p2.nombre}</h3>
             <div className="metrics">
-              <span>⭐ {stats.p2.puntos}</span>
+            <span>⭐ {stats.p2.puntos}</span>
             </div>
-          </div>
-          <div className="avatar-hud">{jugadores.p2.avatar}</div>
         </div>
-      </div>
+        <div className="avatar-hud">
+            <img src={jugadores.p2.avatar} alt="avatar jugador 2" />
+        </div>
+    </div>
+    </div>
 
       {/* --- ÁREA DE JUEGO --- */}
       <div className="zona-pregunta">
@@ -50,9 +55,14 @@ function VistaTrivia({
         {!jugadorActivo ? (
           <div className="aviso-turno esperar">¡PRESIONA TU BOTÓN PARA RESPONDER!</div>
         ) : (
-          <div className="aviso-turno respondiendo">
-            TURNO DE: {jugadores[jugadorActivo].nombre} {jugadores[jugadorActivo].avatar}
-          </div>
+            <div className="aviso-turno respondiendo">
+                TURNO DE: {jugadores[jugadorActivo].nombre}
+                <img
+                    src={jugadores[jugadorActivo].avatar}
+                    alt="avatar turno"
+                    className="avatar-turno"
+                />
+            </div>
         )}
 
         {/* --- FEEDBACK FLOTANTE MEJORADO --- */}

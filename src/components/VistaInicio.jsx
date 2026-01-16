@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 
-const AVATARES = ['🐶', '🐱', '🦊', '🐼', '🐨', '🐯', '🦁', '🐷', '🦄', '🐲', '👽', '🤖'];
+// Importamos los png
+import batman from '../assets/avatars/batman.png';
+import spiderman from '../assets/avatars/spiderman.png';
+import ariel from '../assets/avatars/ariel.jpg';
+import capitanAmerica from '../assets/avatars/capitanAmerica.png';
+import cenicienta from '../assets/avatars/cenicienta.jpg';
+import rapunzel from '../assets/avatars/rapunzel.jpg';
+import superman from '../assets/avatars/superman.png';
+import wonderwoman from '../assets/avatars/wonderwoman.png';
+
+const AVATARES = [batman, spiderman, superman, capitanAmerica, wonderwoman, cenicienta, rapunzel, ariel];
 
 function VistaInicio({ onIniciar }) {
   const [p1Nombre, setP1Nombre] = useState('');
@@ -13,6 +23,7 @@ function VistaInicio({ onIniciar }) {
       alert("¡Por favor ingresen sus nombres!");
       return;
     }
+
     onIniciar({
       p1: { nombre: p1Nombre, avatar: p1Avatar },
       p2: { nombre: p2Nombre, avatar: p2Avatar }
@@ -24,9 +35,11 @@ function VistaInicio({ onIniciar }) {
       <h1 className="titulo-juego">🧠 QUIZ RACING 🏎️</h1>
 
       <div className="seleccion-jugadores">
+
         {/* JUGADOR 1 */}
         <div className="card-jugador p1">
           <h2>JUGADOR 1</h2>
+
           <input
             type="text"
             placeholder="Nombre P1"
@@ -34,14 +47,15 @@ function VistaInicio({ onIniciar }) {
             onChange={(e) => setP1Nombre(e.target.value)}
             maxLength={10}
           />
+
           <div className="grid-avatares">
-            {AVATARES.map(av => (
+            {AVATARES.map((av, index) => (
               <button
-                key={av}
+                key={index}
                 className={`btn-avatar ${p1Avatar === av ? 'seleccionado' : ''}`}
                 onClick={() => setP1Avatar(av)}
               >
-                {av}
+                <img src={av} alt="avatar" />
               </button>
             ))}
           </div>
@@ -52,6 +66,7 @@ function VistaInicio({ onIniciar }) {
         {/* JUGADOR 2 */}
         <div className="card-jugador p2">
           <h2>JUGADOR 2</h2>
+
           <input
             type="text"
             placeholder="Nombre P2"
@@ -59,14 +74,15 @@ function VistaInicio({ onIniciar }) {
             onChange={(e) => setP2Nombre(e.target.value)}
             maxLength={10}
           />
+
           <div className="grid-avatares">
-            {AVATARES.map(av => (
+            {AVATARES.map((av, index) => (
               <button
-                key={av}
+                key={index}
                 className={`btn-avatar ${p2Avatar === av ? 'seleccionado' : ''}`}
                 onClick={() => setP2Avatar(av)}
               >
-                {av}
+                <img src={av} alt="avatar" />
               </button>
             ))}
           </div>
