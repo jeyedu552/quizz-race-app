@@ -1,21 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-// Importamos los png (Manteniendo tus avatares originales)
-import batman from '../assets/avatars/batman.png';
-import spiderman from '../assets/avatars/spiderman.png';
-import ariel from '../assets/avatars/ariel.jpg';
-import capitanAmerica from '../assets/avatars/capitanAmerica.png';
-import cenicienta from '../assets/avatars/cenicienta.jpg';
-import rapunzel from '../assets/avatars/rapunzel.jpg';
-import superman from '../assets/avatars/superman.png';
-import wonderwoman from '../assets/avatars/wonderwoman.png';
+// Importamos los png
+import batman from "../assets/avatars/batman.png";
+import spiderman from "../assets/avatars/spiderman.png";
+import ariel from "../assets/avatars/ariel.jpg";
+import capitanAmerica from "../assets/avatars/capitanAmerica.png";
+import cenicienta from "../assets/avatars/cenicienta.jpg";
+import rapunzel from "../assets/avatars/rapunzel.jpg";
+import superman from "../assets/avatars/superman.png";
+import wonderwoman from "../assets/avatars/wonderwoman.png";
 
-// Lista completa de avatares
-const AVATARES = [batman, spiderman, superman, capitanAmerica, wonderwoman, cenicienta, rapunzel, ariel];
+import { fetchPreguntaFacil } from "../services/preguntas";
+
+const AVATARES = [
+  batman,
+  spiderman,
+  superman,
+  capitanAmerica,
+  wonderwoman,
+  cenicienta,
+  rapunzel,
+  ariel,
+];
 
 function VistaInicio({ onIniciar }) {
-  const [p1Nombre, setP1Nombre] = useState('');
-  const [p2Nombre, setP2Nombre] = useState('');
+  const [p1Nombre, setP1Nombre] = useState("");
+  const [p2Nombre, setP2Nombre] = useState("");
   const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
   const [p2Avatar, setP2Avatar] = useState(AVATARES[1]);
 
@@ -26,7 +36,7 @@ function VistaInicio({ onIniciar }) {
     }
     onIniciar({
       p1: { nombre: p1Nombre, avatar: p1Avatar },
-      p2: { nombre: p2Nombre, avatar: p2Avatar }
+      p2: { nombre: p2Nombre, avatar: p2Avatar },
     });
   };
 
@@ -49,10 +59,18 @@ function VistaInicio({ onIniciar }) {
         </h1>
       </header>
 
-      {/* Layout de Tarjetas */}
+      <button
+        onClick={async () => {
+          const pregunta = await fetchPreguntaFacil();
+          console.log("Pregunta cargada en preguntas:", pregunta);
+          console.log("Pregunta:", pregunta[0].Pregunta);
+        }}
+      >
+        Cargar Pregunta Fácil
+      </button>
+
       <div className="seleccion-jugadores">
-        
-        {/* Tarjeta JUGADOR 1 (Pink) */}
+        {/* JUGADOR 1 */}
         <div className="card-jugador p1">
           <div className="tag-jugador">JUGADOR 1</div>
           
@@ -67,19 +85,18 @@ function VistaInicio({ onIniciar }) {
             />
           </div>
 
-          <div>
-            <span className="input-label">Elige tu avatar:</span>
-            <div className="grid-avatares">
-              {AVATARES.map((av, index) => (
-                <button 
-                  key={index} 
-                  className={`btn-avatar ${p1Avatar === av ? 'seleccionado' : ''}`}
-                  onClick={() => setP1Avatar(av)}
-                >
-                  <img src={av} alt="avatar" />
-                </button>
-              ))}
-            </div>
+          <div className="grid-avatares">
+            {AVATARES.map((av, index) => (
+              <button
+                key={index}
+                className={`btn-avatar ${
+                  p1Avatar === av ? "seleccionado" : ""
+                }`}
+                onClick={() => setP1Avatar(av)}
+              >
+                <img src={av} alt="avatar" />
+              </button>
+            ))}
           </div>
         </div>
 
