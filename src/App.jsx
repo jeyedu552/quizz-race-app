@@ -8,6 +8,7 @@ import VistaInicio from "./components/VistaInicio";
 import VistaTrivia from "./components/VistaTrivia";
 import VistaCarrera from "./components/VistaCarrera";
 import VistaGameOver from "./components/VistaGameOver";
+// Solo importamos lo que ya tienes listo en servicios
 import { fetchPreguntaFacil } from "../src/services/preguntas";
 
 function App() {
@@ -66,21 +67,23 @@ function App() {
     setTimer(30);
 
     // ============================================================
-    // FASE 1: RONDAS 1-5 (
+    // FASE 1: RONDAS 1-5 (Pregunta Fácil desde Backend)
     // ============================================================
     if (ronda <= 5) {
-      // -------------------------------------------------------
-      // [BACKEND] BLOQUE COMENTADO
-      // -------------------------------------------------------
       try {
+        // Usamos el servicio que ya funciona
         const pregunta = await fetchPreguntaFacil();
-        console.log("Pregunta cargada en preguntas:", pregunta);
-        nueva = pregunta[0];
+        if (pregunta && pregunta.length > 0) {
+           nueva = pregunta[0]; 
+        } else if (pregunta && pregunta.ID) { 
+           // Por si acaso el back cambia y devuelve el objeto directo
+           nueva = pregunta;
+        }
       } catch (error) {
         console.error("Error conectando al Backend (Fase 1):", error);
       }
 
-      // Si el backend falla, usar lógica local como fallback
+      // Fallback Local (Respaldo)
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
           (p) => p.nivel === 1 && !idsUsados.includes(p.id)
@@ -95,47 +98,47 @@ function App() {
       tiempoInicioRef.current = Date.now();
     }
     // ============================================================
-    // FASE 2: RONDAS 6-10 (IA / Adaptativo)
+    // FASE 2: RONDAS 6-10 (Cálculo de Métricas + Simulacro)
     // ============================================================
     else {
-      // -------------------------------------------------------
-      // [BACKEND] BLOQUE COMENTADO
-      // -------------------------------------------------------
-      /* try {
-           // 1. Calculamos métricas actuales para enviar al modelo
-           const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
-           const promedioTiempos = tiemposRespuesta.length > 0 ? (sumaTiempos / tiemposRespuesta.length) : 5;
-           const mejorPuntaje = Math.max(stats.p1.puntos, stats.p2.puntos);
+      
+       // ---------------------------------------------------------
+       // 1. PREPARACIÓN DE DATOS 
+       // ---------------------------------------------------------
+       
+       // A. Tiempo Promedio
+       const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
+       const promedioTiempos = tiemposRespuesta.length > 0 
+          ? (sumaTiempos / tiemposRespuesta.length).toFixed(2) 
+          : 5;
 
-           const datosParaEnviar = {
-               tiempo_respuesta_seg: promedioTiempos, 
-               aciertos_pct_ult5: (mejorPuntaje / 500) * 100, // Estimado simple
-               ID_seleccionados: idsUsados 
-           };
+       // B. Asertividad (0 - 100%)
+       // Usamos 'aciertos' en lugar de 'puntos' para evitar que la carrera (+500pts) rompa el cálculo.
+       // Como venimos de la Ronda 5, el máximo de aciertos posibles es 5.
+       const mejorAciertos = Math.max(stats.p1.aciertos, stats.p2.aciertos);
+       const porcentajeAsertividad = (mejorAciertos / 5) * 100;
 
-           console.log("Enviando métricas a la IA:", datosParaEnviar);
+       // Armamos el JSON limpio
+       const datosParaEnviar = {
+           tiempo_respuesta_seg: parseFloat(promedioTiempos), 
+           aciertos_pct_ult5: porcentajeAsertividad, // Ahora sí será 0, 20, 40, 60, 80 o 100
+           ID_seleccionados: idsUsados 
+       };
 
-           const respuesta = await fetch('http://172.29.81.204:5000/predecir', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify(datosParaEnviar),
-               mode: 'cors'
-           });
+       // VERIFICACIÓN
+       console.log("------------------------------------------------");
+       console.log("🚀 [FASE 2] DATOS LISTOS PARA LA IA:");
+       console.log(datosParaEnviar);
+       console.log("------------------------------------------------");
 
-           const data = await respuesta.json();
+        const respuestaIA = await fetchPredecir(datosParaEnviar);
+        if (respuestaIA) nueva = respuestaIA;
 
-           // Opción A: El backend devuelve la pregunta completa
-           if (data.pregunta) {
-               nueva = data.pregunta;
-           } 
-       } catch (error) {
-           console.error("Error conectando al Backend: ", error);
-       } 
-       */
-      // -------------------------------------------------------
-
-      // Lógica Local
+       // ---------------------------------------------------------
+       // 2. LÓGICA PROVISIONAL (Para que sigas jugando)
+       // ---------------------------------------------------------
       if (!nueva) {
+        // Seleccionamos localmente una pregunta de Nivel 2 mientras no haya IA
         const disponibles = baseDeDatosPreguntas.filter(
           (p) => p.nivel === 2 && !idsUsados.includes(p.id)
         );
@@ -148,9 +151,13 @@ function App() {
       }
     }
 
+    // --- ASIGNACIÓN DE LA PREGUNTA ---
     if (nueva) {
       setPreguntaActual(nueva);
-      setIdsUsados((prev) => [...prev, nueva.ID]);
+      
+      // Normalizamos el ID (El back usa 'ID', local usa 'id')
+      const idReal = nueva.ID || nueva.id;
+      setIdsUsados((prev) => [...prev, idReal]);
 
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
@@ -198,7 +205,6 @@ function App() {
       setProgresoCarro((prev) => {
         const nuevoValor = prev[jugador] + 5;
         if (nuevoValor >= 95) {
-          // Meta visual
           alert(`¡GANÓ ${infoJugadores[jugador].nombre}! +500 PTS`);
           setStats((s) => ({
             ...s,
@@ -224,8 +230,12 @@ function App() {
     const segundosTomados = (tiempoFinal - tiempoInicioRef.current) / 1000;
     setTiemposRespuesta((prev) => [...prev, segundosTomados]);
 
-    // Comparación
-    const esCorrecto = textoUsuario === preguntaActual.Respuesta_Correcta;
+    // Comparación (Soporta estructura de Backend con mayúscula y Local con minúscula)
+    const correctaBack = preguntaActual.Respuesta_Correcta;
+    const correctaLocal = preguntaActual.correcta;
+    const respuestaReal = correctaBack || correctaLocal;
+
+    const esCorrecto = textoUsuario === respuestaReal;
 
     setStats((prev) => {
       const jugador = prev[jugadorActivo];
@@ -247,24 +257,17 @@ function App() {
   // --- 3. INPUT HANDLER ---
   useInputHandler({
     onBigButton: presionarBotonGrande,
-    onRed: () => responder("A", preguntaActual?.Opcion_A),
-    onBlue: () => responder("B", preguntaActual?.Opcion_B),
-    onGreen: () => responder("C", preguntaActual?.Opcion_C),
-    onYellow: () => responder("D", preguntaActual?.Opcion_D),
+    // Soporte híbrido para mayúsculas (Backend) y minúsculas (Local)
+    onRed: () => responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
+    onBlue: () => responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
+    onGreen: () => responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
+    onYellow: () => responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
   });
 
   // --- 4. RENDERIZADO ---
-  if (fase === "Inicio") {
-    return <VistaInicio onIniciar={iniciarJuego} />;
-  }
-
-  if (fase === "Game_Over") {
-    return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
-  }
-
-  if (fase === "Carrera") {
-    return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
-  }
+  if (fase === "Inicio") return <VistaInicio onIniciar={iniciarJuego} />;
+  if (fase === "Game_Over") return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
+  if (fase === "Carrera") return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
 
   return (
     <VistaTrivia
@@ -274,9 +277,8 @@ function App() {
       jugadores={infoJugadores}
       jugadorActivo={jugadorActivo}
       feedback={feedback}
-      nivelNombre={
-        preguntaActual ? obtenerNombreNivel(preguntaActual.Nivel) : ""
-      }
+      // Soporte híbrido para Nivel
+      nivelNombre={preguntaActual ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel) : ""}
     />
   );
 }
