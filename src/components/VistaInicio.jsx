@@ -48,7 +48,8 @@ function VistaInicio({ onIniciar }) {
       <button
         onClick={async () => {
           const pregunta = await fetchPreguntaFacil();
-          console.log("Pregunta cargada:", pregunta);
+          console.log("Pregunta cargada en preguntas:", pregunta);
+          console.log("Pregunta:", pregunta[0].Pregunta);
         }}
       >
         Cargar Pregunta Fácil
