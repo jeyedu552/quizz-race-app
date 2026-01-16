@@ -74,7 +74,7 @@ function App() {
        // -------------------------------------------------------
        try {
            console.log("Conectando con Backend: Pregunta Fácil...");
-           const respuesta = await fetch('http://172.29.81.204:5000/preguntafacil', {
+           const respuesta = await fetch('http://192.168.1.242:5001/preguntafacil', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
                body: JSON.stringify({ lista_ids_cache: idsUsados }),
@@ -90,7 +90,7 @@ function App() {
        }
        
        // Si el backend falla, usar lógica local como fallback
-       if (!nueva) {
+       /*if (!nueva) {
            const disponibles = baseDeDatosPreguntas.filter(p => p.nivel === 1 && !idsUsados.includes(p.id));
            if (disponibles.length === 0) {
               const reset = baseDeDatosPreguntas.filter(p => p.nivel === 1);
@@ -98,7 +98,7 @@ function App() {
            } else {
               nueva = disponibles[Math.floor(Math.random() * disponibles.length)];
            }
-       }
+       }*/
        tiempoInicioRef.current = Date.now();
     } 
     // ============================================================

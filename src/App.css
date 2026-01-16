@@ -1,244 +1,1017 @@
 /* =========================================
    1. VARIABLES Y CONFIGURACIÓN GLOBAL
    ========================================= */
-   :root {
-    /* Fondo General (Degradado Stitch) */
-    --bg-gradient: linear-gradient(135deg, #FFF5F5 0%, #FFFBF2 100%);
-    
-    /* Colores de Jugadores */
-    --p1-color: #FF9AA2; 
-    --p1-bg: #FFF0F1;
-    --p2-color: #B5EAD7; 
-    --p2-bg: #E8F8F3;
-  
-    /* Botones Gominola */
-    --btn-rojo: #FFADAD;
-    --btn-azul: #A0C4FF;
-    --btn-verde: #CAFFBF;
-    --btn-amarillo: #FDFFB6;
-  
-    /* Textos */
-    --text-dark: #4A4A4A;
-    --text-light: #888888;
-  }
-  
-  body {
-    margin: 0; padding: 0;
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg-gradient);
-    color: var(--text-dark);
-    height: 100vh; overflow: hidden;
-  }
-  
-  #root { width: 100vw; height: 100vh; }
-  
-  /* =========================================
-     2. PANTALLA DE INICIO (LO QUE TE FALTABA)
-     ========================================= */
-  .inicio-container {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    height: 100%; width: 100%;
-    animation: fadeIn 0.5s ease;
-    background-color: #FFB42B;
-  }
-  
-  .titulo-juego {
-    font-size: 3.5rem; font-weight: 900;
-    color: var(--text-dark); margin-bottom: 40px;
-    text-transform: uppercase; letter-spacing: 2px;
-  }
-  
-  .seleccion-jugadores {
-    display: flex; gap: 30px; align-items: center; margin-bottom: 40px;
-  }
-  
-  .card-jugador {
-    background: white; padding: 25px;
-    border-radius: 30px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
-    text-align: center; width: 300px;
-    border: 4px solid transparent;
-  }
-  .card-jugador.p1 { border-color: var(--p1-color); }
-  .card-jugador.p2 { border-color: var(--p2-color); }
-  
-  .card-jugador h2 { font-size: 1rem; color: var(--text-light); margin-bottom: 10px; }
-  
-  .card-jugador input {
-    width: 90%; padding: 12px; font-size: 1.1rem;
-    border: 2px solid #eee; border-radius: 15px;
-    margin-bottom: 15px; text-align: center; outline: none;
-    font-family: inherit; font-weight: bold; color: var(--text-dark);
-  }
-  .card-jugador input:focus { border-color: #ccc; }
-  
-  .grid-avatares {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  }
-  
-  .btn-avatar {
-    font-size: 1.5rem; background: #f9f9f9;
-    border: 2px solid transparent; border-radius: 12px;
-    cursor: pointer; padding: 5px; transition: all 0.2s;
-  }
-  .btn-avatar:hover { transform: scale(1.1); background: #fff; }
-  
-  .card-jugador.p1 .btn-avatar.seleccionado { background: var(--p1-bg); border-color: var(--p1-color); transform: scale(1.15); }
-  .card-jugador.p2 .btn-avatar.seleccionado { background: var(--p2-bg); border-color: var(--p2-color); transform: scale(1.15); }
-  
-  .vs-badge {
-    font-size: 1.5rem; font-weight: 900; color: #ddd;
-    background: white; padding: 10px; border-radius: 50%;
-  }
-  
-  .btn-iniciar {
-    background: #2ecc71; color: white; border: none;
-    padding: 15px 60px; font-size: 1.5rem; border-radius: 50px;
-    font-weight: 900; cursor: pointer;
-    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
-    transition: transform 0.2s;
-  }
-  .btn-iniciar:hover { transform: scale(1.05); }
+:root {
+  /* Paleta Kawaii Racing */
+  --primary: #2bee8c; /* Verde Neón Suave */
+  --secondary-pink: #ff85c0; /* Rosa Chicle */
+  --bg-color: #fffaf0; /* Crema Suave */
+  --text-dark: #0d1b14; /* Negro Verdoso */
+  --white: #ffffff;
 
-  .btn-avatar {
+  /* Colores de Juego (Trivia/Carrera) */
+  --btn-rojo: #ffadad;
+  --btn-azul: #a0c4ff;
+  --btn-verde: #caffbf;
+  --btn-amarillo: #fdffb6;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Spline Sans", sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  font-size: 12px;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* =========================================
+   2. PANTALLA DE INICIO 
+   ========================================= */
+.inicio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    #fffaf0 0%,
+    #fef3c7 100%
+  ); /* Degradado crema */
+  position: relative;
+}
+
+/* Header */
+.header-inicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.badge-pilotos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.icon-badge {
+  background: var(--primary);
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(43, 238, 140, 0.4);
+}
+.text-badge {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 1.1rem;
+}
+
+.titulo-juego {
+  font-size: 3rem;
+  font-weight: 900;
+  font-style: italic;
+  color: white;
+  line-height: 1;
+  text-shadow: 4px 4px 0px var(--primary); /* Sombra sólida verde */
+  -webkit-text-stroke: 2px var(--text-dark); /* Borde negro */
+  letter-spacing: -2px;
+  margin-top: 10px;
+}
+
+/* Layout de Tarjetas */
+.seleccion-jugadores {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  justify-content: center;
+}
+
+.card-jugador {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 2rem;
+  width: 100%;
+  max-width: 320px;
+  position: relative;
+  box-shadow: 0 20px 0px -5px rgba(0, 0, 0, 0.05); /* Sombra Kawaii */
+  border: 6px solid transparent;
+}
+
+/* Estilos Específicos Jugador 1 (Rosa) */
+.card-jugador.p1 {
+  border-color: var(--secondary-pink);
+}
+.card-jugador.p1 .tag-jugador {
+  background: var(--secondary-pink);
+}
+.card-jugador.p1 input:focus {
+  border-color: var(--secondary-pink);
+}
+
+/* Estilos Específicos Jugador 2 (Verde) */
+.card-jugador.p2 {
+  border-color: var(--primary);
+}
+.card-jugador.p2 .tag-jugador {
+  background: var(--primary);
+  color: var(--text-dark);
+}
+.card-jugador.p2 input:focus {
+  border-color: var(--primary);
+}
+
+.tag-jugador {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  padding: 5px 25px;
+  border-radius: 50px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+.input-label {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+  margin-top: 15px;
+  font-size: 1.1rem;
+}
+
+.card-jugador input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 50px;
+  border: 4px solid #eee;
+  background: var(--bg-color);
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s;
+  box-sizing: border-box; /* Importante para que no se salga */
+}
+
+/* Grid de Avatares */
+.grid-avatares {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-avatar {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: white;
-  border: 2px solid transparent;
+  border: 4px solid transparent;
   cursor: pointer;
-  padding: 5px;
+  padding: 0;
+  overflow: hidden;
+  transition: all 0.2s;
+  background: #f0f0f0;
 }
-
 .btn-avatar img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+}
+.btn-avatar:hover {
+  transform: scale(1.1);
 }
 
-.avatar-grande {
+/* Selección Activa */
+.card-jugador.p1 .btn-avatar.seleccionado {
+  border-color: var(--secondary-pink);
+  box-shadow: 0 0 0 4px rgba(255, 133, 192, 0.2);
+}
+.card-jugador.p2 .btn-avatar.seleccionado {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(43, 238, 140, 0.2);
+}
+
+/* VS Badge Rotado */
+.vs-badge {
+  background: var(--primary);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 8px solid white;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: rotate(12deg) scale(1.1);
+  z-index: 10;
+  margin: 0 -30px; /* Superposición negativa */
+}
+.vs-text {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: white;
+  font-style: italic;
+}
+
+/* Botón Gummy (Gominola) */
+.btn-iniciar {
+  margin-top: 25px;
+  background: var(--primary);
+  color: var(--text-dark);
+  border: none;
+  padding: 15px 50px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  border-radius: 100px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 8px 0px 0px #1ba661; /* Efecto 3D Gummy */
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.btn-iniciar:hover {
+  background: #3aff9d;
+}
+.btn-iniciar:active {
+  transform: translateY(4px); /* Se hunde al presionar */
+  box-shadow: 0 2px 0px 0px #1ba661;
+}
+
+/* Decoración de Fondo */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  z-index: 0;
+  opacity: 0.5;
+}
+.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--secondary-pink);
+  bottom: -50px;
+  left: -50px;
+}
+.blob-2 {
+  width: 300px;
+  height: 300px;
+  background: var(--primary);
+  top: -50px;
+  right: -50px;
+}
+
+/* =========================================
+   3. ESTILOS TRIVIA 
+   ========================================= */
+/* ... (Mantenemos los estilos de Trivia para que no se rompa el juego) ... */
+.game-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+/* HUD Superior */
+.hud-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+.jugador-panel {
+  background: white;
+  border-radius: 50px;
+  padding: 10px 30px 10px 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+  border: 2px solid transparent;
+  transition: transform 0.3s;
+}
+.jugador-panel.activo {
+  transform: scale(1.05);
+  border-color: currentColor;
+}
+.jugador-panel:first-child {
+  color: var(--secondary-pink);
+} /* Actualizado a var nueva */
+.jugador-panel:last-child {
+  color: var(--primary);
+  flex-direction: row-reverse;
+  padding: 10px 10px 10px 30px;
+}
+
+.avatar-hud {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #eee;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.avatar-hud img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info-hud h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.metrics span {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text-dark);
+}
+
+/* Centro */
+.centro-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  top: 10px;
+}
+.nivel-badge {
+  background: white;
+  color: var(--secondary-pink);
+  padding: 5px 20px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  margin-bottom: -15px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+.timer-reloj {
+  width: 90px;
+  height: 90px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 900;
+  border: 4px solid #fff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+/* Zona Pregunta */
+.zona-pregunta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+}
+.pregunta-card {
+  background: white;
+  padding: 40px;
+  border-radius: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  border: 4px solid white;
+}
+.pregunta-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--secondary-pink),
+    var(--primary),
+    var(--btn-azul),
+    var(--btn-amarillo)
+  );
+}
+.pregunta-card h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-dark);
+}
+
+/* Opciones */
+.opciones-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.opcion {
+  padding: 20px 30px;
+  border-radius: 25px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.05);
+  transition: transform 0.1s;
+  border: none;
+  color: var(--text-dark);
+}
+.opcion:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+.opcion::before {
+  content: attr(data-letra);
+  background: rgba(255, 255, 255, 0.6);
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 900;
+}
+.opcion.roja {
+  background: var(--btn-rojo);
+}
+.opcion.azul {
+  background: var(--btn-azul);
+}
+.opcion.verde {
+  background: var(--btn-verde);
+}
+.opcion.amarilla {
+  background: var(--btn-amarillo);
+}
+.opciones-grid.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
+
+.aviso-turno {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #888;
+  font-size: 1.2rem;
+}
+.aviso-turno.respondiendo {
+  color: var(--text-dark);
+}
+.avatar-turno {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-left: 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Feedback */
+.feedback-flotante {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 15px 30px;
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 100;
+  animation: fadeIn 0.3s;
+}
+.feedback-flotante.correcto {
+  color: #2ecc71;
+  border: 3px solid #2ecc71;
+}
+.feedback-flotante.incorrecto {
+  color: #e74c3c;
+  border: 3px solid #e74c3c;
+}
+.feedback-flotante.tiempo {
+  color: #f39c12;
+  border: 3px solid #f39c12;
+}
+.icono-check {
+  font-size: 2rem;
+}
+.texto-feedback {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.titulo-feed {
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* =========================================
+   4. MINIJUEGO DE CARRERAS 
+   ========================================= */
+.minijuego-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background: #221110; 
+  position: relative;
+  overflow: hidden;
+}
+
+/* Marco Principal (Aspect Ratio 16:9) */
+.marco-juego {
+  position: relative;
+  width: 95%;
+  max-width: 1200px;
+  aspect-ratio: 16/9;
+  display: flex;
+  flex-direction: column;
+  background: #2d2d2d;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border: 4px solid #3a1f1c;
+}
+
+/* Header Flotante */
+.header-flotante {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cartel-titulo {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  padding: 15px 40px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+.cartel-titulo h1 {
+  margin: 0;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.cartel-titulo p {
+  color: #ddd;
+  margin: 5px 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Pista y Texturas */
+.pista-area {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #2d2d2d;
+  background-image: radial-gradient(#383838 15%, transparent 16%),
+    radial-gradient(#383838 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+}
+
+.linea-meta {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.patron-ajedrez {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  background-image: linear-gradient(45deg, #000 25%, transparent 25%),
+    linear-gradient(-45deg, #000 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #000 75%),
+    linear-gradient(-45deg, transparent 75%, #000 75%);
+  background-size: 20px 20px;
+  opacity: 0.8;
+}
+
+/* Carriles */
+.carril {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+.carril.p1 {
+  border-bottom: 4px dashed rgba(250, 204, 21, 0.6);
+}
+
+/* Kart y Avatar */
+.kart-grupo {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
+  transition: left 0.1s linear;
+  transform: translateY(10px);
+}
+
+.kart-cuerpo {
+  position: relative;
+  z-index: 20;
+}
+
+.avatar-circulo {
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  margin: 10px auto 15px;
-  background: #fff;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  overflow: hidden;
+  background: white;
+  border: 4px solid;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 20;
+}
+.avatar-circulo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-  
-  /* =========================================
-     3. ESTILOS TRIVIA (STITCH)
-     ========================================= */
+/* Estilos P1 */
+.carril.p1 .avatar-circulo {
+  border-color: #f472b6;
+  background: #fbcfe8;
+  box-shadow: 0 0 20px rgba(244, 114, 182, 0.6);
+}
+.carril.p1 .kart-base {
+  background: #ec4899;
+  border-bottom: 4px solid #be185d;
+}
+.carril.p1 .etiqueta-jugador {
+  background: #ec4899;
+  border: 1px solid #f9a8d4;
+}
 
-  .avatar-hud img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+/* Estilos P2 */
+.carril.p2 .avatar-circulo {
+  border-color: #2dd4bf;
+  background: #99f6e4;
+  box-shadow: 0 0 20px rgba(45, 212, 191, 0.6);
+}
+.carril.p2 .kart-base {
+  background: #14b8a6;
+  border-bottom: 4px solid #0f766e;
+}
+.carril.p2 .etiqueta-jugador {
+  background: #14b8a6;
+  border: 1px solid #5eead4;
+}
 
-  .avatar-turno {
-    width: 30px;
-    height: 30px;
-    margin-left: 10px;
-    vertical-align: middle;
-  }
+.kart-base {
+  position: absolute;
+  bottom: -15px;
+  left: -10px;
+  right: -10px;
+  height: 40px;
+  border-radius: 15px;
+  transform: skewX(-10deg);
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+}
 
+.rueda {
+  position: absolute;
+  bottom: -25px;
+  width: 30px;
+  height: 30px;
+  background: #171717;
+  border-radius: 8px;
+  border: 2px solid #404040;
+}
+.rueda.izq {
+  left: 0;
+}
+.rueda.der {
+  right: 0;
+}
 
-  .game-container {
-    width: 100%; height: 100%; max-width: 1200px;
-    margin: 0 auto; display: flex; flex-direction: column;
-    justify-content: center; padding: 20px; box-sizing: border-box;
-  }
-  
-  .hud-superior {
-    display: flex; justify-content: space-between; align-items: flex-start;
-    margin-bottom: 20px; padding: 0 20px;
-  }
-  
-  .jugador-panel {
-    background: white; border-radius: 50px;
-    padding: 10px 30px 10px 10px;
-    display: flex; align-items: center; gap: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-    border: 2px solid transparent; transition: transform 0.3s;
-  }
-  .jugador-panel.activo { transform: scale(1.05); border-color: currentColor; }
-  .jugador-panel:first-child { color: var(--p1-color); }
-  .jugador-panel:last-child { color: var(--p2-color); flex-direction: row-reverse; padding: 10px 10px 10px 30px; }
-  
-  .avatar-hud {
-    font-size: 2rem; background: #fff; width: 60px; height: 60px;
-    border-radius: 50%; display: flex; justify-content: center; align-items: center;
-  }
-  .jugador-panel:first-child .avatar-hud { background: var(--p1-bg); }
-  .jugador-panel:last-child .avatar-hud { background: var(--p2-bg); }
-  
-  .info-hud h3 { margin: 0; font-size: 0.9rem; color: var(--text-light); }
-  .metrics span { font-size: 1.5rem; font-weight: 900; color: var(--text-dark); }
-  
-  .centro-info { display: flex; flex-direction: column; align-items: center; position: relative; top: 10px; }
-  .nivel-badge {
-    background: white; color: var(--p1-color); padding: 5px 20px;
-    border-radius: 20px; font-weight: 800; font-size: 0.8rem;
-    margin-bottom: -15px; z-index: 2;
-  }
-  .timer-reloj {
-    width: 90px; height: 90px; background: white; border-radius: 50%;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    font-size: 2rem; font-weight: 900; border: 4px solid #fff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative;
-  }
-  
-  /* Zona Pregunta */
-  .zona-pregunta { flex: 1; display: flex; flex-direction: column; justify-content: center; max-width: 900px; margin: 0 auto; width: 100%; position: relative; }
-  
-  .pregunta-card {
-    background: white; padding: 40px; border-radius: 40px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.05); text-align: center;
-    margin-bottom: 30px; position: relative; overflow: hidden;
-  }
-  .pregunta-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px;
-    background: linear-gradient(90deg, var(--p1-color), var(--p2-color), var(--btn-azul), var(--btn-amarillo));
-  }
-  .pregunta-card h2 { font-size: 2.2rem; font-weight: 800; margin: 0; }
-  
-  /* Opciones */
-  .opciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .opcion {
-    padding: 20px 30px; border-radius: 25px; font-size: 1.3rem;
-    font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 15px;
-    box-shadow: 0 8px 0 rgba(0,0,0,0.05); transition: transform 0.1s;
-  }
-  .opcion:active { transform: translateY(4px); box-shadow: none; }
-  .opcion::before {
-    content: attr(data-letra); background: rgba(255,255,255,0.6);
-    width: 35px; height: 35px; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center; font-size: 1rem;
-  }
-  
-  .opcion.roja { background: var(--btn-rojo); }
-  .opcion.azul { background: var(--btn-azul); }
-  .opcion.verde { background: var(--btn-verde); }
-  .opcion.amarilla { background: var(--btn-amarillo); }
-  .opciones-grid.disabled { opacity: 0.5; pointer-events: none; filter: grayscale(100%); }
-  
-  .aviso-turno { text-align: center; margin-bottom: 20px; font-weight: 700; color: var(--text-light); }
-  .aviso-turno.respondiendo { color: var(--text-dark); }
-  
-  /* Feedback Flotante */
-  .feedback-flotante {
-    position: absolute; top: -50px; left: 50%; transform: translateX(-50%);
-    background: white; padding: 15px 30px; border-radius: 20px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px;
-    z-index: 100; animation: fadeIn 0.3s;
-  }
-  .feedback-flotante.correcto { color: #2ecc71; border: 2px solid #2ecc71; }
-  .feedback-flotante.incorrecto { color: #e74c3c; border: 2px solid #e74c3c; }
-  .feedback-flotante.tiempo { color: #f39c12; border: 2px solid #f39c12; }
-  .icono-check { font-size: 2rem; }
-  .texto-feedback { display: flex; flex-direction: column; align-items: flex-start; }
-  .titulo-feed { font-weight: 900; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.etiqueta-jugador {
+  position: absolute;
+  top: -40px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 900;
+  padding: 4px 12px;
+  border-radius: 20px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+/* Efecto Turbo */
+.turbo-viento {
+  position: absolute;
+  right: 90%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.kart-grupo.moviendo .turbo-viento {
+  opacity: 0.8;
+}
+.linea-viento {
+  height: 6px;
+  border-radius: 10px;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+  filter: blur(1px);
+}
+
+/* Footer Controles */
+.footer-controles {
+  height: 100px;
+  background: #221110;
+  border-top: 4px solid #3a1f1c;
+  display: flex;
+  position: relative;
+  z-index: 30;
+}
+.panel-control {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #2a1513, #1a0d0c);
+  position: relative;
+  overflow: hidden;
+}
+.panel-control:first-child {
+  border-right: 1px solid #3a1f1c;
+}
+
+.tecla-arcade {
+  height: 50px;
+  padding: 0 30px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-weight: 900;
+  font-size: 1.2rem;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5);
+  transition: all 0.1s;
+  cursor: pointer;
+}
+.panel-control.p1 .tecla-arcade {
+  background: #db2777;
+  border-bottom: 4px solid #9d174d;
+}
+.panel-control.p2 .tecla-arcade {
+  background: #0d9488;
+  border-bottom: 4px solid #115e59;
+}
+.tecla-arcade:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+  border-bottom-width: 0;
+}
+.borde-color {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+}
+.panel-control.p1 .borde-color {
+  left: 0;
+  background: #ec4899;
+}
+.panel-control.p2 .borde-color {
+  right: 0;
+  background: #14b8a6;
+}
+
+/* =========================================
+   5. PANTALLA GAME OVER (BALANCEADA)
+   ========================================= */
+.victory-container {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, #E3F2FD 0%, #F3E5F5 50%, #FFF3E0 100%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto; /* Scroll si es necesario */
+  overflow-x: hidden;
+  color: #1c0e0d;
+}
+
+/* --- CONFETI --- */
+.confetti-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.confetti { position: absolute; width: 12px; height: 12px; border-radius: 4px; }
+.c-1 { top: 10%; left: 10%; background: #FFD700; transform: rotate(15deg); }
+.c-2 { top: 20%; right: 10%; background: #FF69B4; transform: rotate(-10deg); }
+.c-3 { bottom: 30%; left: 20%; background: #87CEEB; transform: rotate(45deg); }
+.c-4 { top: 15%; left: 40%; background: #98FB98; transform: rotate(30deg); }
+.c-5 { bottom: 10%; right: 20%; background: #FFA07A; transform: rotate(-25deg); }
+
+/* --- HEADER --- */
+.victory-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 20px 40px; /* Más aire a los lados */
+  width: 100%; box-sizing: border-box;
+  flex-shrink: 0;
+}
+.icon-btn {
+  width: 45px; height: 45px; border-radius: 50%;
+  background: rgba(255,255,255,0.6); backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: none; cursor: pointer;
+  color: #1c0e0d; transition: transform 0.2s;
+}
+.icon-btn:hover { transform: scale(1.1); }
+
+/* --- CONTENIDO PRINCIPAL --- */
+.victory-content {
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center; /* Centrado verticalmente */
+  padding: 10px 20px 40px;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px; /* Permitimos que se expanda más */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.titulo-victoria { text-align: center; margin-bottom: 20px; z-index: 20; }
+.titulo-victoria h1 {
+  font-size: 3rem; /* Título grande */
+  font-weight: 900; line-height: 1; margin: 0;
+  text-shadow: 0 4px 0 rgba(255,255,255,0.5);
+  animation: bounce 2s infinite;
+}
+.titulo-victoria p {
+  color: #666; font-size: 1rem; font-weight: 800;
+  text-transform: uppercase; margin-top: 10px; letter-spacing: 2px;
+}
+
+/* --- PODIO Y AVATAR --- */
+.podio-section {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  height: 220px;
+  margin-top: 20px; /* MÁS SEPARACIÓN DEL TÍTULO */
+  margin-bottom: 30px; 
+}
+
+.avatar-ganador-container {
+  z-index: 20; position: relative; transform: translateY(20px);
+}
+
+.img-ganador {
+  width: 160px; height: 160px; /* Avatar de buen tamaño */
+  border-radius: 50%; object-fit: cover; border: 6px solid white;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15); background-color: #fff;
+}
+
+.podio-base {
+  z-index: 10; width: 300px; height: 90px;
+  background: #FFD700;
+  border-radius: 2rem 2rem 1rem 1rem;
+  box-shadow: 0 8px 0 #DAA520;
+  border: 4px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.rank-numero { color: #B8860B; font-size: 3rem; font-weight: 900; opacity: 0.3; }
+
+/* --- TARJETAS (Anchas y Horizontales) --- */
+.stats-grid {
+  display: grid; 
+  grid-template-columns: 1fr 1fr; /* Dos columnas */
+  gap: 20px;
+  width: 100%; 
+  max-width: 900px; /* ¡AQUÍ ESTÁ EL CAMBIO! Mucho más ancho */
+  margin-bottom: 30px;
+}
+
+.card-stat {
+  display: flex; 
+  flex-direction: row; /* Fila horizontal */
+  align-items: center; 
+  text-align: left;
+  gap: 20px; padding: 20px 30px;
+  border-radius: 1.5rem; background: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+  transition: transform 0.2s;
+}
+.card-stat:hover { transform: translateY(-5px); }
+
+.card-stat.winner { border: 4px solid #FFD700; background: #fffdf5; }
+.card-stat.loser { border: 4px solid transparent; background: rgba(255,255,255,0.6); }
+
+.mini-avatar {
+  width: 60px; height: 60px; border-radius: 50%; border: 3px solid #eee;
+  object-fit: cover;
+}
+.card-stat.winner .mini-avatar { border-color: #FFD700; }
+
+.info-stat { flex: 1; } /* Ocupa el resto del espacio */
+.info-stat h2 { margin: 0; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; }
+.puntaje-row { font-size: 1.3rem; font-weight: 800; color: #f43625; margin: 5px 0; }
+
+.barra-progreso { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-top: 5px; }
+.barra-relleno { height: 100%; border-radius: 10px; transition: width 1s ease-out; }
+.card-stat.winner .barra-relleno { background: #10b981; width: 95%; }
+.card-stat.loser .barra-relleno { background: #60a5fa; width: 60%; }
+
+/* --- BOTÓN REPLAY --- */
+.btn-replay {
+  background: #f43625; color: white;
+  width: 100%; max-width: 320px; height: 60px;
+  border-radius: 50px; border: none; cursor: pointer;
+  font-size: 1.2rem; font-weight: 900; letter-spacing: 1px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  box-shadow: 0 6px 0 #b91c1c; margin-top: 10px;
+  transition: transform 0.1s;
+}
+.btn-replay:hover { transform: translateY(-2px); box-shadow: 0 8px 0 #b91c1c; background: #ef4444; }
+.btn-replay:active { transform: translateY(4px); box-shadow: none; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+/* Media Query para Celulares (Vertical) */
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .titulo-victoria h1 { font-size: 2.2rem; }
+  .img-ganador { width: 130px; height: 130px; }
+  .podio-section { height: 180px; }
+}
