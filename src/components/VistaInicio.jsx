@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Importamos los png
 import batman from "../assets/avatars/batman.png";
@@ -10,7 +10,7 @@ import rapunzel from "../assets/avatars/rapunzel.jpg";
 import superman from "../assets/avatars/superman.png";
 import wonderwoman from "../assets/avatars/wonderwoman.png";
 
-import { fetchPreguntaFacil } from "../services/preguntas";
+import { fetchPreguntaFacil, fetchPredecir } from "../services/preguntas";
 
 const AVATARES = [
   batman,
@@ -40,6 +40,16 @@ function VistaInicio({ onIniciar }) {
     });
   };
 
+  const [preguntaBD, setPreguntaBD] = useState(null);
+
+  useEffect(() => {
+    if (preguntaBD) {
+      console.log("Pregunta cargada desde la base de datos:", preguntaBD);
+      console.log("Pregunta: ", preguntaBD.Pregunta);
+      console.log("Nivel:", preguntaBD.Nivel);
+    }
+  }, [preguntaBD]);
+
   return (
     <div className="inicio-container">
       {/* Fondo decorativo (Blobs) */}
@@ -54,31 +64,28 @@ function VistaInicio({ onIniciar }) {
           </div>
           <span className="text-badge">Escuela de Pilotos</span>
         </div>
-        <h1 className="titulo-juego">
-          QUIZ RACING
-        </h1>
+        <h1 className="titulo-juego">QUIZ RACING</h1>
       </header>
 
       <button
         onClick={async () => {
-          const pregunta = await fetchPreguntaFacil();
-          console.log("Pregunta cargada en preguntas:", pregunta);
-          console.log("Pregunta:", pregunta[0].Pregunta);
+          const pregunta = await fetchPredecir(3.67, 120);
+          setPreguntaBD(pregunta);
         }}
       >
-        Cargar Pregunta Fácil
+        Cargar pregunta predecir
       </button>
 
       <div className="seleccion-jugadores">
         {/* JUGADOR 1 */}
         <div className="card-jugador p1">
           <div className="tag-jugador">JUGADOR 1</div>
-          
+
           <div className="mt-4">
             <label className="input-label">¿Cómo te llamas?</label>
-            <input 
-              type="text" 
-              placeholder="Nombre..." 
+            <input
+              type="text"
+              placeholder="Nombre..."
               value={p1Nombre}
               onChange={(e) => setP1Nombre(e.target.value)}
               maxLength={10}
@@ -108,12 +115,12 @@ function VistaInicio({ onIniciar }) {
         {/* Tarjeta JUGADOR 2 (Green) */}
         <div className="card-jugador p2">
           <div className="tag-jugador">JUGADOR 2</div>
-          
+
           <div className="mt-4">
             <label className="input-label">¿Cómo te llamas?</label>
-            <input 
-              type="text" 
-              placeholder="Nombre..." 
+            <input
+              type="text"
+              placeholder="Nombre..."
               value={p2Nombre}
               onChange={(e) => setP2Nombre(e.target.value)}
               maxLength={10}
@@ -124,9 +131,11 @@ function VistaInicio({ onIniciar }) {
             <span className="input-label">Elige tu avatar:</span>
             <div className="grid-avatares">
               {AVATARES.map((av, index) => (
-                <button 
-                  key={index} 
-                  className={`btn-avatar ${p2Avatar === av ? 'seleccionado' : ''}`}
+                <button
+                  key={index}
+                  className={`btn-avatar ${
+                    p2Avatar === av ? "seleccionado" : ""
+                  }`}
                   onClick={() => setP2Avatar(av)}
                 >
                   <img src={av} alt="avatar" />
@@ -135,15 +144,18 @@ function VistaInicio({ onIniciar }) {
             </div>
           </div>
         </div>
-
       </div>
 
       {/* Botón de Inicio */}
       <button className="btn-iniciar" onClick={manejarInicio}>
-        <span className="material-symbols-outlined" style={{fontSize: '2.5rem'}}>play_circle</span>
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: "2.5rem" }}
+        >
+          play_circle
+        </span>
         ¡COMENZAR!
       </button>
-
     </div>
   );
 }

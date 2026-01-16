@@ -8,7 +8,7 @@ import VistaInicio from "./components/VistaInicio";
 import VistaTrivia from "./components/VistaTrivia";
 import VistaCarrera from "./components/VistaCarrera";
 import VistaGameOver from "./components/VistaGameOver";
-import { fetchPreguntaFacil } from "../src/services/preguntas";
+import { fetchPreguntaFacil, fetchPredecir } from "../src/services/preguntas";
 
 function App() {
   // --- ESTADOS GENERALES ---
@@ -98,41 +98,13 @@ function App() {
     // FASE 2: RONDAS 6-10 (IA / Adaptativo)
     // ============================================================
     else {
-      // -------------------------------------------------------
-      // [BACKEND] BLOQUE COMENTADO
-      // -------------------------------------------------------
-      /* try {
-           // 1. Calculamos métricas actuales para enviar al modelo
-           const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
-           const promedioTiempos = tiemposRespuesta.length > 0 ? (sumaTiempos / tiemposRespuesta.length) : 5;
-           const mejorPuntaje = Math.max(stats.p1.puntos, stats.p2.puntos);
-
-           const datosParaEnviar = {
-               tiempo_respuesta_seg: promedioTiempos, 
-               aciertos_pct_ult5: (mejorPuntaje / 500) * 100, // Estimado simple
-               ID_seleccionados: idsUsados 
-           };
-
-           console.log("Enviando métricas a la IA:", datosParaEnviar);
-
-           const respuesta = await fetch('http://172.29.81.204:5000/predecir', {
-               method: 'POST',
-               headers: { 'Content-Type': 'application/json' },
-               body: JSON.stringify(datosParaEnviar),
-               mode: 'cors'
-           });
-
-           const data = await respuesta.json();
-
-           // Opción A: El backend devuelve la pregunta completa
-           if (data.pregunta) {
-               nueva = data.pregunta;
-           } 
-       } catch (error) {
-           console.error("Error conectando al Backend: ", error);
-       } 
-       */
-      // -------------------------------------------------------
+      try {
+        const pregunta = await fetchPredecir(3.67, 120);
+        setPreguntaBD(pregunta);
+        nueva = preguntaBD.Pregunta[0];
+      } catch (error) {
+        console.error("Error conectando al Backend (Fase 2):", error);
+      }
 
       // Lógica Local
       if (!nueva) {
