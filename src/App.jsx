@@ -17,6 +17,7 @@ function App() {
   const [ronda, setRonda] = useState(1);
   const [idsUsados, setIdsUsados] = useState([]);
   const [preguntas, setPreguntas] = useState([]);
+  const [loadingPregunta, setLoadingPregunta] = useState(false);
 
   // --- CONFIGURACIÓN JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -65,6 +66,7 @@ function App() {
     setJugadorActivo(null);
     setFeedback(null);
     setTimer(30);
+    setLoadingPregunta(true);
 
     // ============================================================
     // FASE 1: RONDAS 1-5 (Pregunta Fácil desde Backend)
@@ -168,6 +170,7 @@ function App() {
       const idReal = nueva.ID || nueva.id;
       setIdsUsados((prev) => [...prev, idReal]);
 
+      setLoadingPregunta(false);
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
         setTimer((t) => {
@@ -180,21 +183,29 @@ function App() {
       }, 1000);
     } else {
       setFase("Game_Over");
+      setLoadingPregunta(false);
     }
   };
 
   const manejarTiempoAgotado = () => {
     clearInterval(timerRef.current);
     setFeedback("Tiempo");
-    setTimeout(avanzarSiguientePaso, 2500);
+    // Mostrar breve feedback y luego cargar
+    setTimeout(() => {
+      setFeedback(null);
+      setLoadingPregunta(true);
+      avanzarSiguientePaso();
+    }, 1500);
   };
 
   const avanzarSiguientePaso = () => {
     if (ronda === 5) {
       setFase("Carrera");
       setProgresoCarro({ p1: 0, p2: 0 });
+      setLoadingPregunta(false);
     } else if (ronda === 10) {
       setFase("Game_Over");
+      setLoadingPregunta(false);
     } else {
       setRonda((r) => r + 1);
       cargarPregunta();
@@ -260,7 +271,12 @@ function App() {
     });
 
     setFeedback(esCorrecto ? "Correcto" : "Incorrecto");
-    setTimeout(avanzarSiguientePaso, 2500);
+    // Mostrar feedback y luego cargar
+    setTimeout(() => {
+      setFeedback(null);
+      setLoadingPregunta(true);
+      avanzarSiguientePaso();
+    }, 1500);
   };
 
   // --- 3. INPUT HANDLER ---
@@ -299,6 +315,7 @@ function App() {
       jugadores={infoJugadores}
       jugadorActivo={jugadorActivo}
       feedback={feedback}
+      loadingPregunta={loadingPregunta}
       // Soporte híbrido para Nivel
       nivelNombre={
         preguntaActual
