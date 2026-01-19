@@ -28,10 +28,11 @@ function VistaInicio({ onIniciar }) {
   const [p2Nombre, setP2Nombre] = useState("");
   const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
   const [p2Avatar, setP2Avatar] = useState(AVATARES[1]);
+  const [mostrarAlerta, setMostrarAlerta] = useState(false);
 
   const manejarInicio = () => {
     if (!p1Nombre.trim() || !p2Nombre.trim()) {
-      alert("¡Por favor ingresen sus nombres, pilotos! 🏎️");
+      setMostrarAlerta(true);
       return;
     }
     onIniciar({
@@ -156,6 +157,25 @@ function VistaInicio({ onIniciar }) {
         </span>
         ¡COMENZAR!
       </button>
+
+      {/* Modal Alerta Personalizada */}
+      {mostrarAlerta && (
+        <div className="alerta-overlay">
+          <div className="alerta-modal">
+            <div className="alerta-icono">⚠️</div>
+            <h2 className="alerta-titulo">¡Espera, piloto!</h2>
+            <p className="alerta-mensaje">
+              Por favor ingresen sus nombres, ¡pilotos! 🏎️
+            </p>
+            <button
+              className="alerta-boton"
+              onClick={() => setMostrarAlerta(false)}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

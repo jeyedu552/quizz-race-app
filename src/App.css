@@ -1008,10 +1008,123 @@ body {
 
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
+/* =========================================
+   ALERTA PERSONALIZADA
+   ========================================= */
+.alerta-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(13, 27, 20, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.alerta-modal {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+  border-radius: 30px;
+  padding: 40px 30px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--secondary-pink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alerta-icono {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  animation: bounce 2s infinite;
+}
+
+.alerta-titulo {
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  margin: 10px 0;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.alerta-mensaje {
+  font-size: 1.1rem;
+  color: var(--text-dark);
+  margin: 15px 0 25px 0;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.alerta-boton {
+  background: linear-gradient(135deg, var(--primary) 0%, #1aa068 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(43, 238, 140, 0.4);
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.alerta-boton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(43, 238, 140, 0.6);
+  background: linear-gradient(135deg, #1aa068 0%, #0f8860 100%);
+}
+
+.alerta-boton:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(43, 238, 140, 0.4);
+}
+
 /* Media Query para Celulares (Vertical) */
 @media (max-width: 768px) {
   .stats-grid { grid-template-columns: 1fr; max-width: 400px; }
   .titulo-victoria h1 { font-size: 2.2rem; }
   .img-ganador { width: 130px; height: 130px; }
   .podio-section { height: 180px; }
+  
+  .alerta-modal {
+    padding: 30px 20px;
+    max-width: 85%;
+  }
+  
+  .alerta-titulo {
+    font-size: 1.5rem;
+  }
+  
+  .alerta-mensaje {
+    font-size: 1rem;
+  }
 }
