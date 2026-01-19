@@ -36,6 +36,7 @@ function App() {
   // --- ESTADOS VISUALES ---
   const [timer, setTimer] = useState(30);
   const [feedback, setFeedback] = useState(null);
+  const [shortTimer, setShortTimer] = useState(null); // cronómetro de 3s para el jugador activo
 
   // Minijuego
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
@@ -44,6 +45,7 @@ function App() {
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]);
   const tiempoInicioRef = useRef(Date.now());
   const timerRef = useRef(null);
+  const shortTimerRef = useRef(null);
 
   // --- FUNCIÓN DE INICIO ---
   const iniciarJuego = (datosJugadores) => {
@@ -198,6 +200,20 @@ function App() {
     }, 1500);
   };
 
+  const manejarShortTimerAgotado = () => {
+    // Se agotó el cronómetro corto del jugador activo
+    setJugadorActivo(null);
+    setShortTimer(null);
+    clearInterval(shortTimerRef.current);
+    clearInterval(timerRef.current); // detener el timer principal de 30s
+    setFeedback("Tiempo");
+    setTimeout(() => {
+      setFeedback(null);
+      setLoadingPregunta(true);
+      avanzarSiguientePaso();
+    }, 1500);
+  };
+
   const avanzarSiguientePaso = () => {
     if (ronda === 5) {
       setFase("Carrera");
@@ -214,12 +230,25 @@ function App() {
 
   // --- 2. LÓGICA DE RESPUESTAS ---
   const presionarBotonGrande = (jugador) => {
-    if (fase === "Inicio") return;
+    if (fase === "Inicio" || loadingPregunta) return; // bloquear cuando carga
 
     if (fase === "Trivia") {
       if (!jugadorActivo && !feedback) {
         tiempoInicioRef.current = Date.now();
         setJugadorActivo(jugador);
+        // Iniciar cronómetro de 3 segundos
+        setShortTimer(3);
+        if (shortTimerRef.current) clearInterval(shortTimerRef.current);
+        shortTimerRef.current = setInterval(() => {
+          setShortTimer((t) => {
+            if (t === null) return t;
+            if (t <= 1) {
+              manejarShortTimerAgotado();
+              return 0;
+            }
+            return t - 1;
+          });
+        }, 1000);
       }
     } else if (fase === "Carrera") {
       setProgresoCarro((prev) => {
@@ -241,9 +270,11 @@ function App() {
   };
 
   const responder = (letraUsuario, textoUsuario) => {
-    if (!jugadorActivo || feedback) return;
+    if (!jugadorActivo || feedback || loadingPregunta) return; // bloquear cuando carga
 
     clearInterval(timerRef.current);
+    clearInterval(shortTimerRef.current);
+    setShortTimer(null);
 
     // Métricas
     const tiempoFinal = Date.now();
@@ -316,6 +347,7 @@ function App() {
       jugadorActivo={jugadorActivo}
       feedback={feedback}
       loadingPregunta={loadingPregunta}
+      shortTimer={shortTimer}
       // Soporte híbrido para Nivel
       nivelNombre={
         preguntaActual
