@@ -8,6 +8,7 @@ function VistaTrivia({
   feedback,
   nivelNombre,
   jugadores,
+  loadingPregunta,
 }) {
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ""}`}>
@@ -100,7 +101,11 @@ function VistaTrivia({
 
         {/* Tarjeta de Pregunta */}
         <div className="pregunta-card">
-          <h2>{pregunta ? pregunta.Pregunta : "Cargando pregunta..."}</h2>
+          {loadingPregunta ? (
+            <h2>Cargando pregunta...</h2>
+          ) : (
+            <h2>{pregunta ? pregunta.Pregunta : "Cargando pregunta..."}</h2>
+          )}
         </div>
 
         {/* Opciones */}
