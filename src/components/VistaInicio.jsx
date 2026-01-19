@@ -23,7 +23,7 @@ const AVATARES = [
   ariel,
 ];
 
-function VistaInicio({ onIniciar }) {
+function VistaInicio({ onIniciar, pregunta, setPreguntas }) {
   const [p1Nombre, setP1Nombre] = useState("");
   const [p2Nombre, setP2Nombre] = useState("");
   const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
@@ -41,6 +41,16 @@ function VistaInicio({ onIniciar }) {
   };
 
   const [preguntaBD, setPreguntaBD] = useState(null);
+
+  useEffect(() => {
+    console.log("Componente VistaInicio montado y cargando pregunta");
+    const cargarPregunta = async () => {
+      const pregunta = await fetchPreguntaFacil();
+      setPreguntas(pregunta);
+    };
+
+    cargarPregunta();
+  }, []);
 
   useEffect(() => {
     if (preguntaBD) {
@@ -69,11 +79,20 @@ function VistaInicio({ onIniciar }) {
 
       <button
         onClick={async () => {
-          const pregunta = await fetchPredecir(3.67, 120);
-          setPreguntaBD(pregunta);
+          const preguntaNueva = await fetchPredecir(3.67, 120);
+          console.log("Pregunta nueva cargada:", preguntaNueva);
+          setPregunta((prev) => [...prev, preguntaNueva]);
         }}
       >
         Cargar pregunta predecir
+      </button>
+
+      <button
+        onClick={async () => {
+          console.log("Cargando preguntas cola" + pregunta);
+        }}
+      >
+        cargar preguntas cola
       </button>
 
       <div className="seleccion-jugadores">

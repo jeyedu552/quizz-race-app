@@ -16,6 +16,7 @@ function App() {
   const [preguntaActual, setPreguntaActual] = useState(null);
   const [ronda, setRonda] = useState(1);
   const [idsUsados, setIdsUsados] = useState([]);
+  const [preguntasCola, setPreguntasCola] = useState([]);
 
   // --- CONFIGURACIÓN JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -72,12 +73,12 @@ function App() {
       try {
         // Usamos el servicio que ya funciona
         const pregunta = await fetchPreguntaFacil();
-        if (pregunta && pregunta.length > 0) {
-           nueva = pregunta[0]; 
-        } else if (pregunta && pregunta.ID) { 
-           // Por si acaso el back cambia y devuelve el objeto directo
-           nueva = pregunta;
-        }
+        nueva = pregunta.pregunta[0];
+
+        /*console.log("Respuesta todo: ", pregunta);
+        console.log("Respuesta json: ", pregunta.pregunta);
+        console.log("Respuesta llaves: ", pregunta.pregunta[0]);*/
+        console.log("Pregunta Fase 1:", nueva);
       } catch (error) {
         console.error("Error conectando al Backend (Fase 1):", error);
       }
@@ -85,7 +86,7 @@ function App() {
       // Fallback Local (Respaldo)
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 1 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 1 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 1);
@@ -100,46 +101,46 @@ function App() {
     // FASE 2: RONDAS 6-10 (Cálculo de Métricas + Simulacro)
     // ============================================================
     else {
-      
-       // ---------------------------------------------------------
-       // 1. PREPARACIÓN DE DATOS 
-       // ---------------------------------------------------------
-       
-       // A. Tiempo Promedio
-       const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
-       const promedioTiempos = tiemposRespuesta.length > 0 
-          ? (sumaTiempos / tiemposRespuesta.length).toFixed(2) 
+      // ---------------------------------------------------------
+      // 1. PREPARACIÓN DE DATOS
+      // ---------------------------------------------------------
+
+      // A. Tiempo Promedio
+      const sumaTiempos = tiemposRespuesta.reduce((a, b) => a + b, 0);
+      const promedioTiempos =
+        tiemposRespuesta.length > 0
+          ? (sumaTiempos / tiemposRespuesta.length).toFixed(2)
           : 5;
 
-       // B. Asertividad (0 - 100%)
-       // Usamos 'aciertos' en lugar de 'puntos' para evitar que la carrera (+500pts) rompa el cálculo.
-       // Como venimos de la Ronda 5, el máximo de aciertos posibles es 5.
-       const mejorAciertos = Math.max(stats.p1.aciertos, stats.p2.aciertos);
-       const porcentajeAsertividad = (mejorAciertos / 5) * 100;
+      // B. Asertividad (0 - 100%)
+      // Usamos 'aciertos' en lugar de 'puntos' para evitar que la carrera (+500pts) rompa el cálculo.
+      // Como venimos de la Ronda 5, el máximo de aciertos posibles es 5.
+      const mejorAciertos = Math.max(stats.p1.aciertos, stats.p2.aciertos);
+      const porcentajeAsertividad = (mejorAciertos / 5) * 100;
 
-       // Armamos el JSON limpio
-       const datosParaEnviar = {
-           tiempo_respuesta_seg: parseFloat(promedioTiempos), 
-           aciertos_pct_ult5: porcentajeAsertividad, // Ahora sí será 0, 20, 40, 60, 80 o 100
-           ID_seleccionados: idsUsados 
-       };
+      // Armamos el JSON limpio
+      const datosParaEnviar = {
+        tiempo_respuesta_seg: parseFloat(promedioTiempos),
+        aciertos_pct_ult5: porcentajeAsertividad, // Ahora sí será 0, 20, 40, 60, 80 o 100
+        ID_seleccionados: idsUsados,
+      };
 
-       // VERIFICACIÓN
-       console.log("------------------------------------------------");
-       console.log("🚀 [FASE 2] DATOS LISTOS PARA LA IA:");
-       console.log(datosParaEnviar);
-       console.log("------------------------------------------------");
+      // VERIFICACIÓN
+      console.log("------------------------------------------------");
+      console.log("🚀 [FASE 2] DATOS LISTOS PARA LA IA:");
+      console.log(datosParaEnviar);
+      console.log("------------------------------------------------");
 
-        const respuestaIA = await fetchPredecir(datosParaEnviar);
-        if (respuestaIA) nueva = respuestaIA;
+      const respuestaIA = await fetchPredecir(datosParaEnviar);
+      if (respuestaIA) nueva = respuestaIA;
 
-       // ---------------------------------------------------------
-       // 2. LÓGICA PROVISIONAL (Para que sigas jugando)
-       // ---------------------------------------------------------
+      // ---------------------------------------------------------
+      // 2. LÓGICA PROVISIONAL (Para que sigas jugando)
+      // ---------------------------------------------------------
       if (!nueva) {
         // Seleccionamos localmente una pregunta de Nivel 2 mientras no haya IA
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 2 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 2 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 2);
@@ -153,7 +154,7 @@ function App() {
     // --- ASIGNACIÓN DE LA PREGUNTA ---
     if (nueva) {
       setPreguntaActual(nueva);
-      
+
       // Normalizamos el ID (El back usa 'ID', local usa 'id')
       const idReal = nueva.ID || nueva.id;
       setIdsUsados((prev) => [...prev, idReal]);
@@ -257,16 +258,29 @@ function App() {
   useInputHandler({
     onBigButton: presionarBotonGrande,
     // Soporte híbrido para mayúsculas (Backend) y minúsculas (Local)
-    onRed: () => responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
-    onBlue: () => responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
-    onGreen: () => responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
-    onYellow: () => responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
+    onRed: () =>
+      responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
+    onBlue: () =>
+      responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
+    onGreen: () =>
+      responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
+    onYellow: () =>
+      responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
   });
 
   // --- 4. RENDERIZADO ---
-  if (fase === "Inicio") return <VistaInicio onIniciar={iniciarJuego} />;
-  if (fase === "Game_Over") return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
-  if (fase === "Carrera") return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
+  if (fase === "Inicio")
+    return (
+      <VistaInicio
+        onIniciar={iniciarJuego}
+        pregunta={preguntasCola}
+        setPreguntas={setPreguntasCola}
+      />
+    );
+  if (fase === "Game_Over")
+    return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
+  if (fase === "Carrera")
+    return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
 
   return (
     <VistaTrivia
@@ -277,7 +291,11 @@ function App() {
       jugadorActivo={jugadorActivo}
       feedback={feedback}
       // Soporte híbrido para Nivel
-      nivelNombre={preguntaActual ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel) : ""}
+      nivelNombre={
+        preguntaActual
+          ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel)
+          : ""
+      }
     />
   );
 }

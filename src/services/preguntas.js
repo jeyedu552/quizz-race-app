@@ -1,9 +1,10 @@
-const DEFAULT_HOST = "172.29.81.205:5001";
+const DEFAULT_HOST = "172.29.82.65:5000";
 const IP = import.meta.env?.VITE_API_HOST ?? DEFAULT_HOST;
 const ENDPOINT_PREGUNTA_FACIL = `http://${IP}/preguntafacil`;
 const ENDPOINT_PREGUNTA = `http://${IP}/predecir`;
 export const fetchPreguntaFacil = async () => {
   try {
+    console.log("Fetching pregunta facil from", ENDPOINT_PREGUNTA_FACIL);
     const response = await fetch(ENDPOINT_PREGUNTA_FACIL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
