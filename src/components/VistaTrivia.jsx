@@ -9,9 +9,18 @@ function VistaTrivia({
   nivelNombre,
   jugadores,
   loadingPregunta,
+  shortTimer,
 }) {
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ""}`}>
+      {/* Banner de urgencia del cronómetro corto */}
+      {jugadorActivo && shortTimer !== null && (
+        <div className="short-timer-banner">
+          <div className="short-timer-label">¡Responde Rápido!</div>
+          <div className="short-timer-value">{shortTimer}s</div>
+        </div>
+      )}
+
       {/* --- HUD SUPERIOR --- */}
       <div className="hud-superior">
         {/* Panel Jugador 1 */}
@@ -33,6 +42,10 @@ function VistaTrivia({
         <div className="centro-info">
           <div className="nivel-badge">{nivelNombre}</div>
           <div className="timer-reloj">{timer}s</div>
+          {/* Burbuja secundaria del cronómetro corto */}
+          {jugadorActivo && shortTimer !== null && (
+            <div className="short-timer-chip">{shortTimer}s</div>
+          )}
         </div>
 
         {/* Panel Jugador 2 */}
@@ -109,7 +122,11 @@ function VistaTrivia({
         </div>
 
         {/* Opciones */}
-        <div className={`opciones-grid ${!jugadorActivo ? "disabled" : ""}`}>
+        <div
+          className={`opciones-grid ${
+            !jugadorActivo || loadingPregunta ? "disabled" : ""
+          }`}
+        >
           <div className="opcion roja" data-letra="A">
             {pregunta?.Opcion_A}
           </div>
