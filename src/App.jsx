@@ -16,7 +16,7 @@ function App() {
   const [preguntaActual, setPreguntaActual] = useState(null);
   const [ronda, setRonda] = useState(1);
   const [idsUsados, setIdsUsados] = useState([]);
-  const [preguntasCola, setPreguntasCola] = useState([]);
+  const [preguntas, setPreguntas] = useState([]);
 
   // --- CONFIGURACIÓN JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -71,9 +71,12 @@ function App() {
     // ============================================================
     if (ronda <= 5) {
       try {
+        console.log("Ronda: ", ronda);
+        console.log("Preguntas actuales: ", preguntas[ronda]);
+
         // Usamos el servicio que ya funciona
         const pregunta = await fetchPreguntaFacil();
-        nueva = pregunta.pregunta[0];
+        nueva = pregunta; // el servicio ya retorna la pregunta directamente
 
         /*console.log("Respuesta todo: ", pregunta);
         console.log("Respuesta json: ", pregunta.pregunta);
@@ -273,8 +276,8 @@ function App() {
     return (
       <VistaInicio
         onIniciar={iniciarJuego}
-        pregunta={preguntasCola}
-        setPreguntas={setPreguntasCola}
+        preguntas={preguntas}
+        setPreguntas={setPreguntas}
       />
     );
   if (fase === "Game_Over")

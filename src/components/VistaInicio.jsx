@@ -10,7 +10,11 @@ import rapunzel from "../assets/avatars/rapunzel.jpg";
 import superman from "../assets/avatars/superman.png";
 import wonderwoman from "../assets/avatars/wonderwoman.png";
 
-import { fetchPreguntaFacil, fetchPredecir } from "../services/preguntas";
+import {
+  fetchPreguntaFacil,
+  fetchPredecir,
+  fetchFaciles,
+} from "../services/preguntas";
 
 const AVATARES = [
   batman,
@@ -23,7 +27,7 @@ const AVATARES = [
   ariel,
 ];
 
-function VistaInicio({ onIniciar, pregunta, setPreguntas }) {
+function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
   const [p1Nombre, setP1Nombre] = useState("");
   const [p2Nombre, setP2Nombre] = useState("");
   const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
@@ -42,14 +46,27 @@ function VistaInicio({ onIniciar, pregunta, setPreguntas }) {
 
   const [preguntaBD, setPreguntaBD] = useState(null);
 
-  useEffect(() => {
-    console.log("Componente VistaInicio montado y cargando pregunta");
-    const cargarPregunta = async () => {
-      const pregunta = await fetchPreguntaFacil();
-      setPreguntas(pregunta);
-    };
+  const cargarPregunta = async () => {
+    const preguntaNueva = await fetchPreguntaFacil();
+    setPreguntaBD(preguntaNueva);
+    // Acumular en la cola de preguntas
+    setPreguntas((prev) => [...prev, preguntaNueva]);
+  };
 
-    cargarPregunta();
+  useEffect(() => {
+    console.log(
+      "Componente VistaInicio montado y cargando preguntas iniciales",
+    );
+    const cargarIniciales = async () => {
+      try {
+        const preguntasIniciales = await fetchFaciles();
+        console.log(preguntasIniciales);
+        setPreguntas((prev) => [preguntasIniciales]);
+      } catch (e) {
+        console.error("Error cargando preguntas iniciales:", e);
+      }
+    };
+    cargarIniciales();
   }, []);
 
   useEffect(() => {
@@ -81,15 +98,16 @@ function VistaInicio({ onIniciar, pregunta, setPreguntas }) {
         onClick={async () => {
           const preguntaNueva = await fetchPredecir(3.67, 120);
           console.log("Pregunta nueva cargada:", preguntaNueva);
-          setPregunta((prev) => [...prev, preguntaNueva]);
+          setPreguntaBD(preguntaNueva);
         }}
       >
         Cargar pregunta predecir
       </button>
 
       <button
-        onClick={async () => {
-          console.log("Cargando preguntas cola" + pregunta);
+        onClick={() => {
+          console.log("Cargando preguntas cola", preguntaBD);
+          console.log("Estado preguntas:", preguntas);
         }}
       >
         cargar preguntas cola
