@@ -46,13 +46,6 @@ function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
 
   const [preguntaBD, setPreguntaBD] = useState(null);
 
-  const cargarPregunta = async () => {
-    const preguntaNueva = await fetchPreguntaFacil();
-    setPreguntaBD(preguntaNueva);
-    // Acumular en la cola de preguntas
-    setPreguntas((prev) => [...prev, preguntaNueva]);
-  };
-
   useEffect(() => {
     console.log(
       "Componente VistaInicio montado y cargando preguntas iniciales",
@@ -107,7 +100,7 @@ function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
       <button
         onClick={() => {
           console.log("Cargando preguntas cola", preguntaBD);
-          console.log("Estado preguntas:", preguntas);
+          console.log("Estado preguntas:", preguntas[0][0]);
         }}
       >
         cargar preguntas cola

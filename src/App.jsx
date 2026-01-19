@@ -72,7 +72,7 @@ function App() {
     if (ronda <= 5) {
       try {
         console.log("Ronda: ", ronda);
-        console.log("Preguntas actuales: ", preguntas[ronda]);
+        console.log("Preguntas actuales: ", preguntas);
 
         // Usamos el servicio que ya funciona
         const pregunta = await fetchPreguntaFacil();
@@ -134,7 +134,13 @@ function App() {
       console.log(datosParaEnviar);
       console.log("------------------------------------------------");
 
-      const respuestaIA = await fetchPredecir(datosParaEnviar);
+      console.log(datosParaEnviar.tiempo_respuesta_seg);
+      console.log(datosParaEnviar.aciertos_pct_ult5);
+      const respuestaIA = await fetchPredecir(
+        datosParaEnviar.tiempo_respuesta_seg,
+        datosParaEnviar.aciertos_pct_ult5,
+      );
+      console.log("IA pregunta: ", respuestaIA);
       if (respuestaIA) nueva = respuestaIA;
 
       // ---------------------------------------------------------
