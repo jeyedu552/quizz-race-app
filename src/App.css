@@ -8,6 +8,8 @@
   --bg-color: #fffaf0; /* Crema Suave */
   --text-dark: #0d1b14; /* Negro Verdoso */
   --white: #ffffff;
+  --bg-gradient-start: #fffaf0;
+  --bg-gradient-end: #fef3c7;
 
   /* Colores de Juego (Trivia/Carrera) */
   --btn-rojo: #ffadad;
@@ -36,255 +38,148 @@ body {
 /* =========================================
    2. PANTALLA DE INICIO 
    ========================================= */
-.inicio-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+
+/* Contenedor Principal */
+.contenedor-inicio {
+  min-height: 100vh;
   width: 100%;
-  background: linear-gradient(
-    180deg,
-    #fffaf0 0%,
-    #fef3c7 100%
-  ); /* Degradado crema */
-  position: relative;
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'Varela Round', sans-serif;
+  overflow: hidden; position: relative;
 }
 
 /* Header */
-.header-inicio {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 2rem;
+.header-principal { text-align: center; margin-bottom: 20px; z-index: 10; }
+.badge-escuela { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.icono-badge { background: var(--primary); color: white; padding: 8px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.badge-escuela h2 { margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dark); }
+
+.titulo-kawaii {
+  font-size: 4rem; font-weight: 900; font-style: italic; color: white; margin: 0;
+  text-shadow: 4px 4px 0px var(--primary); -webkit-text-stroke: 2px var(--text-dark);
 }
 
-.badge-pilotos {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.icon-badge {
-  background: var(--primary);
-  color: white;
-  padding: 8px;
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(43, 238, 140, 0.4);
-}
-.text-badge {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: 1.1rem;
+/* Área Central */
+.area-seleccion {
+  display: flex; gap: 40px; align-items: center; justify-content: center;
+  width: 100%; max-width: 1000px; padding: 20px; z-index: 10;
+  flex-wrap: wrap; /* Para móviles */
 }
 
-.titulo-juego {
-  font-size: 3rem;
-  font-weight: 900;
-  font-style: italic;
-  color: white;
-  line-height: 1;
-  text-shadow: 4px 4px 0px var(--primary); /* Sombra sólida verde */
-  -webkit-text-stroke: 2px var(--text-dark); /* Borde negro */
-  letter-spacing: -2px;
-  margin-top: 10px;
+/* Tarjetas */
+.tarjeta-jugador {
+  background: white; padding: 25px; border-radius: 30px;
+  width: 320px; position: relative;
+  box-shadow: 0 20px 0px -5px rgba(0,0,0,0.05);
+  border: 6px solid transparent; transition: transform 0.2s;
+}
+.tarjeta-jugador:hover { transform: scale(1.02); }
+
+.tarjeta-jugador.rosa { border-color: var(--secondary-pink); }
+.tarjeta-jugador.verde { border-color: var(--primary); }
+
+.etiqueta-jugador {
+  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+  color: white; padding: 5px 25px; border-radius: 50px; font-weight: 900; font-size: 1.1rem;
+  white-space: nowrap; box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+}
+.tarjeta-jugador.rosa .etiqueta-jugador { background: var(--secondary-pink); }
+.tarjeta-jugador.verde .etiqueta-jugador { background: var(--primary); color: var(--text-dark); }
+
+/* Inputs y Selects */
+.contenido-tarjeta label { font-weight: 700; display: block; margin-bottom: 8px; color: #555; }
+.fila-input { display: flex; gap: 10px; margin-bottom: 20px; }
+
+select {
+  width: 100%; padding: 12px; border-radius: 15px; border: 3px solid #eee;
+  font-size: 1rem; font-weight: bold; outline: none; background: #fff; cursor: pointer;
+}
+.rosa select:focus { border-color: var(--secondary-pink); }
+.verde select:focus { border-color: var(--primary); }
+
+.btn-nuevo {
+  width: 50px; height: 50px; border-radius: 15px; border: none; color: white;
+  font-size: 1.5rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: all 0.1s;
+}
+.btn-nuevo:active { transform: translateY(4px); box-shadow: none; }
+.btn-nuevo.rosa { background: var(--secondary-pink); }
+.btn-nuevo.verde { background: var(--primary); color: var(--text-dark); }
+
+/* Área Avatar */
+.area-avatar {
+  background: #fafafa; border-radius: 20px; min-height: 180px; padding: 20px;
+  border: 4px dashed #eee; display: flex; justify-content: center; align-items: center;
+}
+.rosa .area-avatar { background: #fff0f5; border-color: #ffdeeb; }
+.verde .area-avatar { background: #f0fff4; border-color: #d1fae5; }
+
+.avatar-display { text-align: center; animation: pop-in 0.4s; }
+.avatar-display img { width: 100px; height: 100px; border-radius: 50%; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); object-fit: cover; }
+.avatar-display h3 { margin: 10px 0 5px 0; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; }
+.badge-nivel { background: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; color: #888; }
+
+.avatar-placeholder { text-align: center; color: #ccc; }
+.avatar-placeholder span { font-size: 4rem; display: block; }
+
+/* VS Badge */
+.vs-central {
+  font-size: 3rem; font-weight: 900; font-style: italic; color: white;
+  background: var(--primary); width: 80px; height: 80px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 6px solid white; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  transform: rotate(12deg); z-index: 20;
 }
 
-/* Layout de Tarjetas */
-.seleccion-jugadores {
-  display: flex;
-  gap: 40px;
-  align-items: center;
-  position: relative;
-  width: 100%;
-  max-width: 1000px;
-  justify-content: center;
+/* Botón Comenzar */
+.btn-comenzar {
+  margin-top: 30px; padding: 15px 60px; font-size: 1.8rem; font-weight: 900;
+  border-radius: 50px; border: none; color: var(--text-dark); cursor: pointer;
+  background: var(--primary); box-shadow: 0 8px 0 #1ba661;
+  display: flex; align-items: center; gap: 10px; transition: all 0.1s; z-index: 10;
 }
+.btn-comenzar:hover { background: #3aff9d; }
+.btn-comenzar:active { transform: translateY(4px); box-shadow: 0 2px 0 #1ba661; }
+.btn-comenzar.deshabilitado { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; transform: none; box-shadow: none; }
 
-.card-jugador {
-  background: var(--white);
-  padding: 1.5rem;
-  border-radius: 2rem;
-  width: 100%;
-  max-width: 320px;
-  position: relative;
-  box-shadow: 0 20px 0px -5px rgba(0, 0, 0, 0.05); /* Sombra Kawaii */
-  border: 6px solid transparent;
+/* Modal */
+.modal-fondo {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100;
+  backdrop-filter: blur(5px);
 }
+.modal-caja {
+  background: white; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px;
+  text-align: center; border: 6px solid #FFD700; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  animation: pop-in 0.3s;
+}
+.modal-caja input {
+  width: 100%; padding: 15px; font-size: 1.2rem; border: 3px solid #ddd; border-radius: 15px;
+  margin: 20px 0; text-align: center; font-weight: bold; outline: none;
+}
+.modal-caja input:focus { border-color: #FFD700; }
 
-/* Estilos Específicos Jugador 1 (Rosa) */
-.card-jugador.p1 {
-  border-color: var(--secondary-pink);
+.grid-avatares-modal { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.grid-avatares-modal img {
+  width: 60px; height: 60px; border-radius: 15px; cursor: pointer; border: 3px solid transparent; transition: transform 0.2s;
 }
-.card-jugador.p1 .tag-jugador {
-  background: var(--secondary-pink);
-}
-.card-jugador.p1 input:focus {
-  border-color: var(--secondary-pink);
-}
+.grid-avatares-modal img:hover { transform: scale(1.1); }
+.grid-avatares-modal img.seleccionado { border-color: #FFD700; background: #fffbe6; transform: scale(1.1); }
 
-/* Estilos Específicos Jugador 2 (Verde) */
-.card-jugador.p2 {
-  border-color: var(--primary);
-}
-.card-jugador.p2 .tag-jugador {
-  background: var(--primary);
-  color: var(--text-dark);
-}
-.card-jugador.p2 input:focus {
-  border-color: var(--primary);
-}
+.botones-modal { display: flex; gap: 15px; }
+.botones-modal button { flex: 1; padding: 15px; border-radius: 15px; border: none; font-weight: 900; cursor: pointer; }
+.btn-cancelar { background: #f0f0f0; color: #888; }
+.btn-guardar { background: #FFD700; color: #5a4a00; box-shadow: 0 4px 0 #b49a00; }
+.btn-guardar:active { transform: translateY(4px); box-shadow: none; }
 
-.tag-jugador {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  padding: 5px 25px;
-  border-radius: 50px;
-  font-weight: 900;
-  font-size: 1.1rem;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-}
-
-.input-label {
-  font-weight: 700;
-  display: block;
-  margin-bottom: 8px;
-  margin-top: 15px;
-  font-size: 1.1rem;
-}
-
-.card-jugador input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 50px;
-  border: 4px solid #eee;
-  background: var(--bg-color);
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  outline: none;
-  transition: all 0.3s;
-  box-sizing: border-box; /* Importante para que no se salga */
-}
-
-/* Grid de Avatares */
-.grid-avatares {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.btn-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 4px solid transparent;
-  cursor: pointer;
-  padding: 0;
-  overflow: hidden;
-  transition: all 0.2s;
-  background: #f0f0f0;
-}
-.btn-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.btn-avatar:hover {
-  transform: scale(1.1);
-}
-
-/* Selección Activa */
-.card-jugador.p1 .btn-avatar.seleccionado {
-  border-color: var(--secondary-pink);
-  box-shadow: 0 0 0 4px rgba(255, 133, 192, 0.2);
-}
-.card-jugador.p2 .btn-avatar.seleccionado {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(43, 238, 140, 0.2);
-}
-
-/* VS Badge Rotado */
-.vs-badge {
-  background: var(--primary);
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 8px solid white;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  transform: rotate(12deg) scale(1.1);
-  z-index: 10;
-  margin: 0 -30px; /* Superposición negativa */
-}
-.vs-text {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: white;
-  font-style: italic;
-}
-
-/* Botón Gummy (Gominola) */
-.btn-iniciar {
-  margin-top: 25px;
-  background: var(--primary);
-  color: var(--text-dark);
-  border: none;
-  padding: 15px 50px;
-  font-size: 1.5rem;
-  font-weight: 900;
-  border-radius: 100px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  box-shadow: 0 8px 0px 0px #1ba661; /* Efecto 3D Gummy */
-  transition:
-    transform 0.1s,
-    box-shadow 0.1s;
-}
-.btn-iniciar:hover {
-  background: #3aff9d;
-}
-.btn-iniciar:active {
-  transform: translateY(4px); /* Se hunde al presionar */
-  box-shadow: 0 2px 0px 0px #1ba661;
-}
-
-/* Decoración de Fondo */
-.blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  z-index: 0;
-  opacity: 0.5;
-}
-.blob-1 {
-  width: 300px;
-  height: 300px;
-  background: var(--secondary-pink);
-  bottom: -50px;
-  left: -50px;
-}
-.blob-2 {
-  width: 300px;
-  height: 300px;
-  background: var(--primary);
-  top: -50px;
-  right: -50px;
-}
+/* Animación */
+@keyframes pop-in { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 /* =========================================
    3. ESTILOS TRIVIA 
    ========================================= */
-/* ... (Mantenemos los estilos de Trivia para que no se rompa el juego) ... */
+
 .game-container {
   width: 100%;
   height: 100%;
@@ -1237,3 +1132,4 @@ body {
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
+
