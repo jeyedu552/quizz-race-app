@@ -1,4 +1,11 @@
-import React from "react";
+import React from 'react';
+
+// Icono simple de check
+const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+);
 
 function VistaTrivia({
   pregunta,
@@ -6,15 +13,19 @@ function VistaTrivia({
   stats,
   jugadorActivo,
   feedback,
-  nivelNombre,
   jugadores,
-  loadingPregunta,
+  ronda,
   shortTimer,
-  usaIA,
+  nivelNombre 
 }) {
+
+  const totalRondas = Array.from({ length: 10 }, (_, i) => i + 1);
+  const porcentajeProgreso = Math.min(((ronda - 1) / 9) * 100, 100);
+
   return (
-    <div className={`game-container ${feedback ? feedback.toLowerCase() : ""}`}>
-      {/* Banner de urgencia del cronómetro corto */}
+    <div className={`game-container ${feedback ? feedback.toLowerCase() : ''}`}>
+
+      {/* Banner de urgencia (3s) */}
       {jugadorActivo && shortTimer !== null && (
         <div className="short-timer-banner">
           <div className="short-timer-label">¡Responde Rápido!</div>
@@ -24,18 +35,11 @@ function VistaTrivia({
 
       {/* --- HUD SUPERIOR --- */}
       <div className="hud-superior">
-        {/* Indicador de IA */}
-        {usaIA && (
-          <div className="ia-indicator" title="Pregunta seleccionada por IA">
-            <span className="ia-dot" /> IA ACTIVA
-          </div>
-        )}
-        {/* Panel Jugador 1 */}
-        <div
-          className={`jugador-panel ${jugadorActivo === "p1" ? "activo" : ""}`}
-        >
+        
+        {/* === JUGADOR 1 === */}
+        <div className={`jugador-panel ${jugadorActivo === 'p1' ? 'activo' : ''}`}>
           <div className="avatar-hud">
-            <img src={jugadores.p1.avatar} alt="avatar jugador 1" />
+            <img src={jugadores.p1.avatar} alt="avatar p1" />
           </div>
           <div className="info-hud">
             <h3>{jugadores.p1.nombre}</h3>
@@ -45,52 +49,88 @@ function VistaTrivia({
           </div>
         </div>
 
-        {/* Centro */}
-        <div className="centro-info">
-          <div className="nivel-badge">{nivelNombre}</div>
-          <div className="timer-reloj">{timer}s</div>
-          {/* Burbuja secundaria del cronómetro corto */}
-          {jugadorActivo && shortTimer !== null && (
-            <div className="short-timer-chip">{shortTimer}s</div>
+        {/* === BARRA CENTRAL === */}
+        <div className="hud-central-nuevo">
+          {nivelNombre && (
+             <div className="nivel-badge">{nivelNombre}</div>
           )}
+
+          <span className="label-rondas">Rondas</span>
+          
+          <div className="barra-track-container">
+            <div className="linea-fondo">
+              <div className="parte-normal"></div>
+              <div className="parte-ia"></div>
+            </div>
+
+            <div className="linea-progreso" style={{ width: `${porcentajeProgreso}%` }}></div>
+
+            {totalRondas.map((num) => {
+              let claseNodo = "nodo-ronda";
+              let contenido = null;
+
+              if (num < ronda) {
+                claseNodo += " completado";
+                if (num >= 6) claseNodo += " fase-ia"; 
+                contenido = <CheckIcon />;
+              } else if (num === ronda) {
+                claseNodo += " actual";
+                contenido = num;
+              } else {
+                if (num === 6) { 
+                  claseNodo += " ia futuro";
+                  contenido = "IA";
+                } else if (num > 6) {
+                   claseNodo += " ia-futuro-simple";
+                } else {
+                   claseNodo += " futuro";
+                }
+              }
+
+              return (
+                <div key={num} className={claseNodo}>
+                  {contenido}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="timer-nuevo-container">
+            <div className="timer-nuevo-bg"></div>
+            <div className="timer-circulo">
+               <span className="timer-numero">{timer}</span>
+               <span className="timer-label">SEC</span>
+            </div>
+          </div>
         </div>
 
-        {/* Panel Jugador 2 */}
-        <div
-          className={`jugador-panel ${jugadorActivo === "p2" ? "activo" : ""}`}
-        >
-          <div className="info-hud" style={{ textAlign: "right" }}>
+        {/* === JUGADOR 2 === */}
+        <div className={`jugador-panel ${jugadorActivo === 'p2' ? 'activo' : ''}`}>
+          <div className="info-hud" style={{ textAlign: 'right' }}>
             <h3>{jugadores.p2.nombre}</h3>
             <div className="metrics">
               <span>⭐ {stats.p2.puntos}</span>
             </div>
           </div>
           <div className="avatar-hud">
-            <img src={jugadores.p2.avatar} alt="avatar jugador 2" />
+            <img src={jugadores.p2.avatar} alt="avatar p2" />
           </div>
         </div>
       </div>
 
       {/* --- ÁREA DE JUEGO --- */}
       <div className="zona-pregunta">
-        {/* Aviso de Turno */}
         {!jugadorActivo ? (
-          <div className="aviso-turno esperar">
-            ¡PRESIONA TU BOTÓN PARA RESPONDER!
-          </div>
+          <div className="aviso-turno esperar">¡PRESIONA TU BOTÓN PARA RESPONDER!</div>
         ) : (
-          <div className="aviso-turno respondiendo">
-            TURNO DE: {jugadores[jugadorActivo].nombre}
-            <img
-              src={jugadores[jugadorActivo].avatar}
-              alt="avatar turno"
-              className="avatar-turno"
-            />
-          </div>
+            <div className="aviso-turno respondiendo">
+                TURNO DE: {jugadores[jugadorActivo].nombre}
+                <img src={jugadores[jugadorActivo].avatar} alt="turno" className="avatar-turno"/>
+            </div>
         )}
 
-        {/* --- FEEDBACK FLOTANTE MEJORADO --- */}
-        {feedback === "Correcto" && (
+        {/* Feedback Flotante */}
+        {feedback === 'Correcto' && (
           <div className="feedback-flotante correcto">
             <div className="icono-check">✅</div>
             <div className="texto-feedback">
@@ -99,8 +139,7 @@ function VistaTrivia({
             </div>
           </div>
         )}
-
-        {feedback === "Incorrecto" && (
+        {feedback === 'Incorrecto' && (
           <div className="feedback-flotante incorrecto">
             <div className="icono-check">❌</div>
             <div className="texto-feedback">
@@ -109,43 +148,24 @@ function VistaTrivia({
             </div>
           </div>
         )}
-
-        {feedback === "Tiempo" && (
+        {feedback === 'Tiempo' && (
           <div className="feedback-flotante tiempo">
             <div className="icono-check">⏱️</div>
-            <div className="texto-feedback">
-              <span className="titulo-feed">¡TIEMPO!</span>
-            </div>
+            <div className="texto-feedback"><span className="titulo-feed">¡TIEMPO!</span></div>
           </div>
         )}
 
-        {/* Tarjeta de Pregunta */}
         <div className="pregunta-card">
-          {loadingPregunta ? (
-            <h2>Cargando pregunta...</h2>
-          ) : (
-            <h2>{pregunta ? pregunta.Pregunta : "Cargando pregunta..."}</h2>
-          )}
+          <h2>
+            {pregunta ? (pregunta.pregunta || pregunta.Pregunta) : "Cargando..."}
+          </h2>
         </div>
 
-        {/* Opciones */}
-        <div
-          className={`opciones-grid ${
-            !jugadorActivo || loadingPregunta ? "disabled" : ""
-          }`}
-        >
-          <div className="opcion roja" data-letra="A">
-            {pregunta?.Opcion_A}
-          </div>
-          <div className="opcion azul" data-letra="B">
-            {pregunta?.Opcion_B}
-          </div>
-          <div className="opcion verde" data-letra="C">
-            {pregunta?.Opcion_C}
-          </div>
-          <div className="opcion amarilla" data-letra="D">
-            {pregunta?.Opcion_D}
-          </div>
+        <div className={`opciones-grid ${!jugadorActivo ? 'disabled' : ''}`}>
+          <div className="opcion roja" data-letra="A">{pregunta?.opcion_a || pregunta?.Opcion_A}</div>
+          <div className="opcion azul" data-letra="B">{pregunta?.opcion_b || pregunta?.Opcion_B}</div>
+          <div className="opcion verde" data-letra="C">{pregunta?.opcion_c || pregunta?.Opcion_C}</div>
+          <div className="opcion amarilla" data-letra="D">{pregunta?.opcion_d || pregunta?.Opcion_D}</div>
         </div>
       </div>
     </div>

@@ -231,10 +231,12 @@ function App() {
 
   // Determina el flujo del juego (Siguiente Ronda, Carrera o Fin del Juego)
   const avanzarSiguientePaso = () => {
+    // Caso especial: Fin de la Fase 1
     if (ronda === 5) {
       setFase("Carrera");
       setProgresoCarro({ p1: 0, p2: 0 });
       setLoadingPregunta(false);
+    // Caso especial: Fin del Juego
     } else if (ronda === 10) {
       setFase("Game_Over");
       setLoadingPregunta(false);
@@ -383,6 +385,7 @@ function App() {
       feedback={feedback}
       loadingPregunta={loadingPregunta}
       shortTimer={shortTimer}
+      ronda={ronda}
       usaIA={usaIA}
       nivelNombre={
         preguntaActual
