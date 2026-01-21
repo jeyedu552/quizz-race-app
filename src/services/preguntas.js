@@ -5,40 +5,8 @@ const ENDPOINT_PREGUNTA = `http://${IP}/predecir`;
 const ENDPOINT_FACILES = `http://${IP}/cargarFaciles`;
 const ENDPOINT_USUARIOS = `http://${IP}/usuarios`; //Para listar
 const ENDPOINT_CREAR_USUARIO = `http://${IP}/usuariosCrear`; // Para guardar nuevo
+const ENDPOINT_GUARDAR_PUNTAJE = `http://${IP}/guardarPuntaje`; // Para guardar el puntaje
 
-// --- DATOS QUEMADOS (SIMULACIÓN) ---
-const USUARIOS_MOCK = [
-  {
-    id_usuario: 1,
-    nickname: "Súper Pepe",
-    avatar_code: "batman",
-    puntos_totales: 1500,
-  },
-  {
-    id_usuario: 2,
-    nickname: "Ana Rayo",
-    avatar_code: "wonderwoman",
-    puntos_totales: 2300,
-  },
-  {
-    id_usuario: 3,
-    nickname: "Capitán X",
-    avatar_code: "capitanAmerica",
-    puntos_totales: 500,
-  },
-  {
-    id_usuario: 4,
-    nickname: "Princesa",
-    avatar_code: "rapunzel",
-    puntos_totales: 3200,
-  },
-  {
-    id_usuario: 5,
-    nickname: "Spidey",
-    avatar_code: "spiderman",
-    puntos_totales: 1200,
-  },
-];
 
 //Lógica para traer pregunta fácil
 export const fetchPreguntaFacil = async () => {
@@ -101,50 +69,19 @@ export const fetchPredecir = async (tiempoOrPayload, acertividad) => {
 
 // 2. FETCH USUARIOS (MODO HÍBRIDO)
 export const fetchUsuarios = async () => {
-  // --- MODO SIMULACIÓN (ACTIVO) ---
-  /*  console.log("⚠️ [MOCK] Cargando lista de usuarios simulada...");
-  return new Promise((resolve) => {
-    // Simulamos que tarda 0.5 segundos en llegar del servidor
-    setTimeout(() => {
-      resolve(USUARIOS_MOCK);
-    }, 500);
-  });*/
-
-  // --- MODO REAL (COMENTADO - DESCOMENTAR CUANDO ESTÉ EL BACKEND) ---
-
   try {
     const response = await fetch(ENDPOINT_USUARIOS);
     const data = await response.json();
     console.log("Usuarios cargados desde service:", data);
     return data.usuarios;
-    console.log;
   } catch (error) {
     console.error("Error cargando usuarios:", error);
     return [];
   }
 };
 
-// 3. CREAR USUARIO (MODO HÍBRIDO)
+// 3. CREAR USUARIO 
 export const crearUsuario = async (nickname, avatarCode) => {
-  /*// --- MODO SIMULACIÓN (ACTIVO) ---
-  console.log(`⚠️ [MOCK] Creando usuario: ${nickname}`);
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Creamos un objeto falso
-      const nuevoUsuario = {
-        id_usuario: Date.now(), // Usamos la hora como ID único temporal
-        nickname: nickname,
-        avatar_code: avatarCode,
-        puntos_totales: 0,
-      };
-      // Lo guardamos en la lista temporal para que aparezca al recargar (mientras no cierres la pestaña)
-      USUARIOS_MOCK.push(nuevoUsuario);
-      resolve(nuevoUsuario);
-    }, 500);
-  });*/
-
-  // --- MODO REAL (COMENTADO - DESCOMENTAR CUANDO ESTÉ EL BACKEND) ---
-
   try {
     const response = await fetch(ENDPOINT_CREAR_USUARIO, {
       method: "POST",
@@ -159,5 +96,28 @@ export const crearUsuario = async (nickname, avatarCode) => {
   } catch (error) {
     console.log("Error creando usuario:", error);
     return null;
+  }
+};
+
+// --- 5. GUARDAR PUNTAJE FINAL 
+export const guardarPuntajeFinal = async (datosFinales) => {
+  try {
+    console.log("Enviando puntajes a:", ENDPOINT_GUARDAR_PUNTAJE);
+    const response = await fetch(ENDPOINT_GUARDAR_PUNTAJE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datosFinales)
+    });
+
+    if (response.ok) {
+        console.log("Puntajes guardados correctamente");
+        return true;
+    } else {
+        console.error("Error del servidor al guardar puntajes");
+        return false;
+    }
+  } catch (error) {
+    console.error("Error de conexión guardando puntajes:", error);
+    return false;
   }
 };

@@ -8,7 +8,11 @@ import VistaInicio from "./components/VistaInicio";
 import VistaTrivia from "./components/VistaTrivia";
 import VistaCarrera from "./components/VistaCarrera";
 import VistaGameOver from "./components/VistaGameOver";
-import { fetchPreguntaFacil, fetchPredecir } from "./services/preguntas";
+import {
+  fetchPreguntaFacil,
+  fetchPredecir,
+  guardarPuntajeFinal,
+} from "./services/preguntas";
 
 function App() {
   // --- ESTADOS GENERALES DE LA APLICACIÓN ---
@@ -98,7 +102,7 @@ function App() {
   const cargarPregunta = async (rondaOverride = null) => {
     // Se determina la ronda actual, priorizando el override si existe
     const rondaActual = rondaOverride !== null ? rondaOverride : ronda;
-    
+
     let nueva;
     setJugadorActivo(null);
     setFeedback(null);
@@ -120,7 +124,7 @@ function App() {
       // Fallback: Selección local si falla el servicio
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 1 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 1 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 1);
@@ -160,7 +164,7 @@ function App() {
       // 3. Fallback: Selección local si no hay respuesta de IA
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 2 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 2 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 2);
@@ -178,7 +182,7 @@ function App() {
       setIdsUsados((prev) => [...prev, idReal]);
 
       setLoadingPregunta(false);
-      
+
       // Reinicio del temporizador principal
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
@@ -316,11 +320,40 @@ function App() {
   // --- MAPEO DE CONTROLES FÍSICOS (HOOK) ---
   useInputHandler({
     onBigButton: presionarBotonGrande,
-    onRed: () => responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
-    onBlue: () => responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
-    onGreen: () => responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
-    onYellow: () => responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
+    onRed: () =>
+      responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
+    onBlue: () =>
+      responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
+    onGreen: () =>
+      responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
+    onYellow: () =>
+      responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
   });
+
+  // --- 4. GUARDAR PUNTAJES ---
+  const manejarFinDelJuego = async () => {
+    // Preparamos el JSON
+    const datosFinales = {
+      jugador1: {
+        nombre: infoJugadores.p1.nombre,
+        puntaje: stats.p1.puntos,
+      },
+      jugador2: {
+        nombre: infoJugadores.p2.nombre,
+        puntaje: stats.p2.puntos,
+      },
+    };
+
+    // Usamos el servicio (mucho más limpio)
+    await guardarPuntajeFinal(datosFinales);
+  };
+
+  // Efecto que detecta el Game Over
+  useEffect(() => {
+    if (fase === "Game_Over") {
+      manejarFinDelJuego();
+    }
+  }, [fase]);
 
   // --- RENDERIZADO CONDICIONAL DE VISTAS ---
   if (fase === "Inicio")
