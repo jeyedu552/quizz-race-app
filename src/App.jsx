@@ -22,6 +22,7 @@ function App() {
   const [idsUsados, setIdsUsados] = useState([]);
   const [preguntas, setPreguntas] = useState([]);
   const [loadingPregunta, setLoadingPregunta] = useState(false);
+  const [usaIA, setUsaIA] = useState(false); // Indica si la pregunta se eligió usando IA
 
   // --- CONFIGURACIÓN DE JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -113,6 +114,8 @@ function App() {
     // FASE 1: RONDAS 1-5 (Preguntas de Nivel Básico)
     // ============================================================
     if (rondaActual <= 5) {
+      // En rondas básicas no usamos IA
+      setUsaIA(false);
       try {
         console.log("Cargando pregunta para Ronda:", rondaActual);
         const pregunta = await fetchPreguntaFacil();
@@ -158,6 +161,7 @@ function App() {
       console.log("Enviando métricas a IA:", datosParaEnviar);
 
       // 2. Se solicita la predicción al servicio
+      setUsaIA(true);
       const respuestaIA = await fetchPredecir(datosParaEnviar);
       if (respuestaIA) nueva = respuestaIA;
 
@@ -379,6 +383,7 @@ function App() {
       feedback={feedback}
       loadingPregunta={loadingPregunta}
       shortTimer={shortTimer}
+      usaIA={usaIA}
       nivelNombre={
         preguntaActual
           ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel)

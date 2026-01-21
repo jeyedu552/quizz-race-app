@@ -10,6 +10,7 @@ function VistaTrivia({
   jugadores,
   loadingPregunta,
   shortTimer,
+  usaIA,
 }) {
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ""}`}>
@@ -23,6 +24,12 @@ function VistaTrivia({
 
       {/* --- HUD SUPERIOR --- */}
       <div className="hud-superior">
+        {/* Indicador de IA */}
+        {usaIA && (
+          <div className="ia-indicator" title="Pregunta seleccionada por IA">
+            <span className="ia-dot" /> IA ACTIVA
+          </div>
+        )}
         {/* Panel Jugador 1 */}
         <div
           className={`jugador-panel ${jugadorActivo === "p1" ? "activo" : ""}`}
