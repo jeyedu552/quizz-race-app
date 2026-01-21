@@ -41,10 +41,15 @@ function App() {
   // --- ESTADOS DE CONTROL VISUAL Y TIEMPO ---
   const [timer, setTimer] = useState(30);
   const [feedback, setFeedback] = useState(null);
-  const [shortTimer, setShortTimer] = useState(null); // Cronómetro de 3s para turno activo
+  const [shortTimer, setShortTimer] = useState(null); // cronómetro de 3s para el jugador activo
+  const [opcionSeleccionada, setOpcionSeleccionada] = useState(null);
+  const [esCorrecta, setEsCorrecta] = useState(null);
 
   // Estado del Minijuego de Carrera
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
+  const [mostrarIntroCarrera, setMostrarIntroCarrera] = useState(false);
+  const [ganadorCarrera, setGanadorCarrera] = useState(null);
+  const [continuarDespuesGanador, setContinuarDespuesGanador] = useState(null);
 
   // Referencias para métricas y control de intervalos
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]);
@@ -58,6 +63,13 @@ function App() {
     setFase("Trivia");
     cargarPregunta();
   };
+
+  // Monitorear cambios en ganadorCarrera
+  useEffect(() => {
+    if (ganadorCarrera) {
+      console.log("Ganador detectado:", ganadorCarrera);
+    }
+  }, [ganadorCarrera]);
 
   // Determina el nombre legible del nivel basado en su número
   const obtenerNombreNivel = (nivelNum) => {
@@ -107,6 +119,8 @@ function App() {
     let nueva;
     setJugadorActivo(null);
     setFeedback(null);
+    setOpcionSeleccionada(null);
+    setEsCorrecta(null);
     setTimer(30);
     setLoadingPregunta(true);
 
@@ -229,6 +243,13 @@ function App() {
     }, 1500);
   };
 
+  const continuarDespuesDelGanador = () => {
+    setGanadorCarrera(null);
+    setFase("Trivia");
+    setRonda(6);
+    cargarPregunta();
+  };
+
   // Determina el flujo del juego (Siguiente Ronda, Carrera o Fin del Juego)
   const avanzarSiguientePaso = () => {
     if (ronda === 5) {
@@ -268,11 +289,20 @@ function App() {
         }, 1000);
       }
     } else if (fase === "Carrera") {
-      // Actualiza el progreso del carro. La validación de victoria se maneja en el useEffect.
-      setProgresoCarro((prev) => ({
-        ...prev,
-        [jugador]: prev[jugador] + 5,
-      }));
+      setProgresoCarro((prev) => {
+        const nuevoValor = prev[jugador] + 5;
+        console.log(`Jugador ${jugador} presionó. Progreso: ${nuevoValor}`);
+        if (nuevoValor >= 95) {
+          console.log(`¡${infoJugadores[jugador].nombre} GANÓ!`);
+          setGanadorCarrera(infoJugadores[jugador].nombre);
+          setStats((s) => ({
+            ...s,
+            [jugador]: { ...s[jugador], puntos: s[jugador].puntos + 500 },
+          }));
+          return { p1: 0, p2: 0 };
+        }
+        return { ...prev, [jugador]: nuevoValor };
+      });
     }
   };
 
@@ -297,6 +327,9 @@ function App() {
     const respuestaReal = correctaBack || correctaLocal;
 
     const esCorrecto = textoUsuario === respuestaReal;
+
+    setOpcionSeleccionada(letraUsuario);
+    setEsCorrecta(esCorrecto);
 
     // Actualización de estadísticas del jugador activo
     setStats((prev) => {
@@ -323,6 +356,8 @@ function App() {
 
   // --- MAPEO DE CONTROLES FÍSICOS (HOOK) ---
   useInputHandler({
+    onBigButton: ganadorCarrera ? continuarDespuesDelGanador : presionarBotonGrande,
+    // Soporte híbrido para mayúsculas (Backend) y minúsculas (Local)
     onBigButton: presionarBotonGrande,
     onRed: () =>
       responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
@@ -371,7 +406,30 @@ function App() {
   if (fase === "Game_Over")
     return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
   if (fase === "Carrera")
-    return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
+    return (
+      <>
+        <VistaCarrera 
+          progreso={progresoCarro} 
+          jugadores={infoJugadores} 
+          onIntroFinalizada={() => setMostrarIntroCarrera(false)}
+          onP1Press={() => presionarBotonGrande('p1')}
+          onP2Press={() => presionarBotonGrande('p2')}
+        />
+        {ganadorCarrera && (
+          <div className="modal-ganador-carrera">
+            <div className="contenedor-ganador-carrera">
+              <div className="checkered-top"></div>
+              <h2>🏁 ¡{ganadorCarrera} GANÓ! 🏁</h2>
+              <p className="puntos-ganador">+500 PTS</p>
+              <button className="btn-siguiente-pregunta" onClick={continuarDespuesDelGanador}>
+                SIGUIENTE PREGUNTA
+              </button>
+              <div className="checkered-bottom"></div>
+            </div>
+          </div>
+        )}
+      </>
+    );
 
   return (
     <VistaTrivia
@@ -383,6 +441,9 @@ function App() {
       feedback={feedback}
       loadingPregunta={loadingPregunta}
       shortTimer={shortTimer}
+      opcionSeleccionada={opcionSeleccionada}
+      esCorrecta={esCorrecta}
+      // Soporte híbrido para Nivel
       usaIA={usaIA}
       nivelNombre={
         preguntaActual

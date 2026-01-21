@@ -1,9 +1,32 @@
 import React, { useEffect, useState } from 'react';
 
-function VistaCarrera({ progreso, jugadores }) {
+function VistaCarrera({ progreso, jugadores, onIntroFinalizada, onP1Press, onP2Press }) {
   // Estado local para detectar si se están moviendo (para efecto visual de turbo)
   const [moviendoP1, setMoviendoP1] = useState(false);
   const [moviendoP2, setMoviendoP2] = useState(false);
+  const [mostrarIntro, setMostrarIntro] = useState(true);
+
+  const manejarContinuar = () => {
+    setMostrarIntro(false);
+    if (onIntroFinalizada) {
+      onIntroFinalizada();
+    }
+  };
+
+  // Escuchar teclas ESPACIO y ENTER cuando el intro está activo
+  useEffect(() => {
+    if (!mostrarIntro) return;
+
+    const manejarTecla = (e) => {
+      if (e.code === 'Space' || e.code === 'Enter') {
+        e.preventDefault();
+        manejarContinuar();
+      }
+    };
+
+    window.addEventListener('keydown', manejarTecla);
+    return () => window.removeEventListener('keydown', manejarTecla);
+  }, [mostrarIntro]);
 
   // Usamos un pequeño retraso (10ms) para evitar el "Cascading Render Error"
   useEffect(() => {
@@ -33,16 +56,21 @@ function VistaCarrera({ progreso, jugadores }) {
 
   return (
     <div className="minijuego-container">
-      <div className="marco-juego">
-        
-        {/* Header Flotante */}
-        <div className="header-flotante">
-          <div className="cartel-titulo">
-            <h1>🏁 ¡CARRERA RÁPIDA! 🏁</h1>
+      {/* Modal Intro Carrera */}
+      {mostrarIntro && (
+        <div className="modal-intro-carrera">
+          <div className="contenedor-intro-carrera">
+            <h2>🏁 ¡CARRERA RÁPIDA! 🏁</h2>
             <p>¡Presiona tu botón repetidamente para acelerar!</p>
+            <button className="btn-continuar-intro" onClick={manejarContinuar}>
+              COMENZAR
+            </button>
           </div>
         </div>
+      )}
 
+      <div className="marco-juego">
+        
         {/* Área de Pista */}
         <div className="pista-area">
           
@@ -118,22 +146,22 @@ function VistaCarrera({ progreso, jugadores }) {
         <div className="footer-controles">
            
            {/* Control P1 */}
-           <div className="panel-control p1">
+           <button className="panel-control p1" onClick={() => onP1Press && onP1Press()}>
               <div className="borde-color"></div>
               <div className="tecla-arcade">
                  <span className="material-symbols-outlined">space_bar</span>
                  ESPACIO
               </div>
-           </div>
+           </button>
 
            {/* Control P2 */}
-           <div className="panel-control p2">
+           <button className="panel-control p2" onClick={() => onP2Press && onP2Press()}>
               <div className="borde-color"></div>
               <div className="tecla-arcade">
                  <span className="material-symbols-outlined">keyboard_return</span>
                  ENTER
               </div>
-           </div>
+           </button>
 
         </div>
 

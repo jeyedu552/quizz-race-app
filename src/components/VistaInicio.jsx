@@ -273,6 +273,28 @@ function VistaInicio({ onIniciar }) {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Botón de Inicio */}
+      <button className="btn-iniciar" onClick={manejarInicio}>
+        <span
+          className="material-symbols-outlined"
+          style={{ fontSize: "2.5rem" }}
+        >
+          play_circle
+        </span>
+        ¡COMENZAR!
+      </button>
+
+      {/* Alerta Personalizada */}
+      {mostrarAlerta && (
+        <div className="modal-alerta-inicio">
+          <div className="contenedor-alerta">
+            <div className="icono-alerta">⚠️</div>
+            <h3>¡Espera, pilotos!</h3>
+            <p>Por favor, ingresen sus nombres para continuar</p>
+          </div>
+        </div>
       )}
     </div>
   );
