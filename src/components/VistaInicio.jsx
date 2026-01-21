@@ -32,10 +32,12 @@ function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
   const [p2Nombre, setP2Nombre] = useState("");
   const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
   const [p2Avatar, setP2Avatar] = useState(AVATARES[1]);
+  const [mostrarAlerta, setMostrarAlerta] = useState(false);
 
   const manejarInicio = () => {
     if (!p1Nombre.trim() || !p2Nombre.trim()) {
-      alert("¡Por favor ingresen sus nombres, pilotos! 🏎️");
+      setMostrarAlerta(true);
+      setTimeout(() => setMostrarAlerta(false), 3000);
       return;
     }
     onIniciar({
@@ -121,7 +123,7 @@ function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
               maxLength={10}
             />
           </div>
-
+          <span className="input-label">Elige tu avatar:</span>
           <div className="grid-avatares">
             {AVATARES.map((av, index) => (
               <button
@@ -186,6 +188,17 @@ function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
         </span>
         ¡COMENZAR!
       </button>
+
+      {/* Alerta Personalizada */}
+      {mostrarAlerta && (
+        <div className="modal-alerta-inicio">
+          <div className="contenedor-alerta">
+            <div className="icono-alerta">⚠️</div>
+            <h3>¡Espera, pilotos!</h3>
+            <p>Por favor, ingresen sus nombres para continuar</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

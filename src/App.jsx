@@ -40,6 +40,9 @@ function App() {
 
   // Minijuego
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
+  const [mostrarIntroCarrera, setMostrarIntroCarrera] = useState(false);
+  const [ganadorCarrera, setGanadorCarrera] = useState(null);
+  const [continuarDespuesGanador, setContinuarDespuesGanador] = useState(null);
 
   // Refs para métricas
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]);
@@ -53,6 +56,13 @@ function App() {
     setFase("Trivia");
     cargarPregunta();
   };
+
+  // Monitorear cambios en ganadorCarrera
+  useEffect(() => {
+    if (ganadorCarrera) {
+      console.log("Ganador detectado:", ganadorCarrera);
+    }
+  }, [ganadorCarrera]);
 
   const obtenerNombreNivel = (nivelNum) => {
     if (nivelNum === 1) return "🌱 FÁCIL";
@@ -214,6 +224,13 @@ function App() {
     }, 1500);
   };
 
+  const continuarDespuesDelGanador = () => {
+    setGanadorCarrera(null);
+    setFase("Trivia");
+    setRonda(6);
+    cargarPregunta();
+  };
+
   const avanzarSiguientePaso = () => {
     if (ronda === 5) {
       setFase("Carrera");
@@ -253,15 +270,14 @@ function App() {
     } else if (fase === "Carrera") {
       setProgresoCarro((prev) => {
         const nuevoValor = prev[jugador] + 5;
+        console.log(`Jugador ${jugador} presionó. Progreso: ${nuevoValor}`);
         if (nuevoValor >= 95) {
-          alert(`¡GANÓ ${infoJugadores[jugador].nombre}! +500 PTS`);
+          console.log(`¡${infoJugadores[jugador].nombre} GANÓ!`);
+          setGanadorCarrera(infoJugadores[jugador].nombre);
           setStats((s) => ({
             ...s,
             [jugador]: { ...s[jugador], puntos: s[jugador].puntos + 500 },
           }));
-          setFase("Trivia");
-          setRonda(6);
-          cargarPregunta();
           return { p1: 0, p2: 0 };
         }
         return { ...prev, [jugador]: nuevoValor };
@@ -312,7 +328,7 @@ function App() {
 
   // --- 3. INPUT HANDLER ---
   useInputHandler({
-    onBigButton: presionarBotonGrande,
+    onBigButton: ganadorCarrera ? continuarDespuesDelGanador : presionarBotonGrande,
     // Soporte híbrido para mayúsculas (Backend) y minúsculas (Local)
     onRed: () =>
       responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
@@ -336,7 +352,30 @@ function App() {
   if (fase === "Game_Over")
     return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
   if (fase === "Carrera")
-    return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
+    return (
+      <>
+        <VistaCarrera 
+          progreso={progresoCarro} 
+          jugadores={infoJugadores} 
+          onIntroFinalizada={() => setMostrarIntroCarrera(false)}
+          onP1Press={() => presionarBotonGrande('p1')}
+          onP2Press={() => presionarBotonGrande('p2')}
+        />
+        {ganadorCarrera && (
+          <div className="modal-ganador-carrera">
+            <div className="contenedor-ganador-carrera">
+              <div className="checkered-top"></div>
+              <h2>🏁 ¡{ganadorCarrera} GANÓ! 🏁</h2>
+              <p className="puntos-ganador">+500 PTS</p>
+              <button className="btn-siguiente-pregunta" onClick={continuarDespuesDelGanador}>
+                SIGUIENTE PREGUNTA
+              </button>
+              <div className="checkered-bottom"></div>
+            </div>
+          </div>
+        )}
+      </>
+    );
 
   return (
     <VistaTrivia
