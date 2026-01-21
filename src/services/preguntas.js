@@ -6,7 +6,7 @@ const ENDPOINT_FACILES = `http://${IP}/cargarFaciles`;
 const ENDPOINT_USUARIOS = `http://${IP}/usuarios`; //Para listar
 const ENDPOINT_CREAR_USUARIO = `http://${IP}/usuariosCrear`; // Para guardar nuevo
 const ENDPOINT_GUARDAR_PUNTAJE = `http://${IP}/guardarPuntaje`; // Para guardar el puntaje
-
+const ENDPOINT_CARGAR_PUNTAJE = `http://${IP}/cargarpuntaje`; // Para cargar el puntaje
 
 //Lógica para traer pregunta fácil
 export const fetchPreguntaFacil = async () => {
@@ -80,7 +80,7 @@ export const fetchUsuarios = async () => {
   }
 };
 
-// 3. CREAR USUARIO 
+// 3. CREAR USUARIO
 export const crearUsuario = async (nickname, avatarCode) => {
   try {
     const response = await fetch(ENDPOINT_CREAR_USUARIO, {
@@ -99,25 +99,45 @@ export const crearUsuario = async (nickname, avatarCode) => {
   }
 };
 
-// --- 5. GUARDAR PUNTAJE FINAL 
+// --- 5. GUARDAR PUNTAJE FINAL
 export const guardarPuntajeFinal = async (datosFinales) => {
   try {
     console.log("Enviando puntajes a:", ENDPOINT_GUARDAR_PUNTAJE);
     const response = await fetch(ENDPOINT_GUARDAR_PUNTAJE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datosFinales)
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datosFinales),
     });
 
     if (response.ok) {
-        console.log("Puntajes guardados correctamente");
-        return true;
+      console.log("Puntajes guardados correctamente");
+      return true;
     } else {
-        console.error("Error del servidor al guardar puntajes");
-        return false;
+      console.error("Error del servidor al guardar puntajes");
+      return false;
     }
   } catch (error) {
     console.error("Error de conexión guardando puntajes:", error);
     return false;
+  }
+};
+
+export const fetchCargarPuntaje = async (id_1, puntaje_1, id_2, puntaje_2) => {
+  try {
+    const response = await fetch(ENDPOINT_CARGAR_PUNTAJE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_usuario_1: id_1,
+        puntaje_1: puntaje_1,
+        id_usuario_2: id_2,
+        puntaje_2: puntaje_2,
+      }),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error cargando puntaje:", error);
+    return null;
   }
 };
