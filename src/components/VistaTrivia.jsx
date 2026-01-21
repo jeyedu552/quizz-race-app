@@ -94,7 +94,7 @@ function VistaTrivia({
           <div className="feedback-flotante correcto">
             <div className="icono-check">✅</div>
             <div className="texto-feedback">
-              <span className="titulo-feed">¡CORRECTO!</span>
+              <span className="titulo-feed">Correcto!! Punto para ti</span>
               <span className="puntos-feed">+100 PTS</span>
             </div>
           </div>
@@ -104,7 +104,7 @@ function VistaTrivia({
           <div className="feedback-flotante incorrecto">
             <div className="icono-check">❌</div>
             <div className="texto-feedback">
-              <span className="titulo-feed">¡INCORRECTO!</span>
+              <span className="titulo-feed">¡Uy, cerca! ¡No te rindas!</span>
               <span className="puntos-feed">0 PTS</span>
             </div>
           </div>
