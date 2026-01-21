@@ -316,6 +316,38 @@ select {
   box-shadow: none;
 }
 
+/* Botón Leaderboard */
+.btn-leaderboard {
+  padding: 12px 45px;
+  font-size: 1.3rem;
+  font-weight: 900;
+  border-radius: 50px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 6px 0 #5a4a8f;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.btn-leaderboard:hover {
+  background: linear-gradient(135deg, #7c92ff 0%, #8b5cc4 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #5a4a8f;
+}
+.btn-leaderboard:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #5a4a8f;
+}
+.btn-leaderboard::before {
+  content: "🏆";
+  font-size: 1.2em;
+}
+
 /* Modal */
 .modal-fondo {
   position: fixed;
