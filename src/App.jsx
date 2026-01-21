@@ -18,6 +18,7 @@ function App() {
   const [idsUsados, setIdsUsados] = useState([]);
   const [preguntas, setPreguntas] = useState([]);
   const [loadingPregunta, setLoadingPregunta] = useState(false);
+  const [usaIA, setUsaIA] = useState(false); // Indica si la pregunta se eligió usando IA
 
   // --- CONFIGURACIÓN DE JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -98,7 +99,7 @@ function App() {
   const cargarPregunta = async (rondaOverride = null) => {
     // Se determina la ronda actual, priorizando el override si existe
     const rondaActual = rondaOverride !== null ? rondaOverride : ronda;
-    
+
     let nueva;
     setJugadorActivo(null);
     setFeedback(null);
@@ -109,6 +110,8 @@ function App() {
     // FASE 1: RONDAS 1-5 (Preguntas de Nivel Básico)
     // ============================================================
     if (rondaActual <= 5) {
+      // En rondas básicas no usamos IA
+      setUsaIA(false);
       try {
         console.log("Cargando pregunta para Ronda:", rondaActual);
         const pregunta = await fetchPreguntaFacil();
@@ -120,7 +123,7 @@ function App() {
       // Fallback: Selección local si falla el servicio
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 1 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 1 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 1);
@@ -154,13 +157,14 @@ function App() {
       console.log("Enviando métricas a IA:", datosParaEnviar);
 
       // 2. Se solicita la predicción al servicio
+      setUsaIA(true);
       const respuestaIA = await fetchPredecir(datosParaEnviar);
       if (respuestaIA) nueva = respuestaIA;
 
       // 3. Fallback: Selección local si no hay respuesta de IA
       if (!nueva) {
         const disponibles = baseDeDatosPreguntas.filter(
-          (p) => p.nivel === 2 && !idsUsados.includes(p.id)
+          (p) => p.nivel === 2 && !idsUsados.includes(p.id),
         );
         if (disponibles.length === 0) {
           const reset = baseDeDatosPreguntas.filter((p) => p.nivel === 2);
@@ -178,7 +182,7 @@ function App() {
       setIdsUsados((prev) => [...prev, idReal]);
 
       setLoadingPregunta(false);
-      
+
       // Reinicio del temporizador principal
       if (timerRef.current) clearInterval(timerRef.current);
       timerRef.current = setInterval(() => {
@@ -316,10 +320,14 @@ function App() {
   // --- MAPEO DE CONTROLES FÍSICOS (HOOK) ---
   useInputHandler({
     onBigButton: presionarBotonGrande,
-    onRed: () => responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
-    onBlue: () => responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
-    onGreen: () => responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
-    onYellow: () => responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
+    onRed: () =>
+      responder("A", preguntaActual.Opcion_A || preguntaActual.opcion_a),
+    onBlue: () =>
+      responder("B", preguntaActual.Opcion_B || preguntaActual.opcion_b),
+    onGreen: () =>
+      responder("C", preguntaActual.Opcion_C || preguntaActual.opcion_c),
+    onYellow: () =>
+      responder("D", preguntaActual.Opcion_D || preguntaActual.opcion_d),
   });
 
   // --- RENDERIZADO CONDICIONAL DE VISTAS ---
@@ -346,6 +354,7 @@ function App() {
       feedback={feedback}
       loadingPregunta={loadingPregunta}
       shortTimer={shortTimer}
+      usaIA={usaIA}
       nivelNombre={
         preguntaActual
           ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel)
