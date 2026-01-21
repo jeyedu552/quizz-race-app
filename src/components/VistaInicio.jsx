@@ -279,3 +279,4 @@ function VistaInicio({ onIniciar }) {
 }
 
 export default VistaInicio;
+

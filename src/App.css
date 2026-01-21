@@ -1393,3 +1393,43 @@ select {
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
+
+/* =========================================
+   NUEVOS ESTILOS: GIF BOTÓN ROJO EN PREGUNTA
+   ========================================= */
+
+/* Contenedor flexible para alinear GIF y Texto */
+.contenido-pregunta {
+  display: flex;
+  align-items: center;       /* Centra verticalmente */
+  justify-content: center;   /* Centra horizontalmente todo el grupo */
+  gap: 20px;                 /* Espacio entre el GIF y la Pregunta */
+  width: 100%;
+}
+
+/* Estilo para el GIF */
+.icono-pregunta {
+  width: 70px;               /* Tamaño del GIF (puedes cambiarlo a 60px u 80px) */
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;            /* Evita que la imagen se aplaste si el texto es largo */
+}
+
+/* Aseguramos que el texto no tenga márgenes extraños que rompan la alineación */
+.contenido-pregunta h2 {
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* --- Versión Móvil (Responsivo) --- */
+/* Si la pantalla es muy chica, pone la imagen arriba del texto */
+@media (max-width: 600px) {
+  .contenido-pregunta {
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .icono-pregunta {
+    width: 50px; /* Un poco más pequeño en celular */
+  }
+}

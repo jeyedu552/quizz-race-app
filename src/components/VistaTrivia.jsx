@@ -1,4 +1,5 @@
 import React from "react";
+import gifBoton from '../assets/boton-rojo.gif';
 
 function VistaTrivia({
   pregunta,
@@ -120,12 +121,18 @@ function VistaTrivia({
         )}
 
         {/* Tarjeta de Pregunta */}
-        <div className="pregunta-card">
-          {loadingPregunta ? (
-            <h2>Cargando pregunta...</h2>
-          ) : (
-            <h2>{pregunta ? pregunta.Pregunta : "Cargando pregunta..."}</h2>
-          )}
+  <div className="pregunta-card">
+            <div className="contenido-pregunta">
+                {/* Aquí está tu GIF */}
+                <img src={gifBoton} alt="Alerta" className="icono-pregunta" />
+                
+                {/* Aquí está el texto de la pregunta */}
+                {loadingPregunta ? (
+                    <h2>Cargando pregunta...</h2>
+                ) : (
+                    <h2>{pregunta ? pregunta.Pregunta : "Cargando pregunta..."}</h2>
+                )}
+            </div>
         </div>
 
         {/* Opciones */}
