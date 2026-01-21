@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { fetchUsuarios, crearUsuario } from "../services/preguntas";
 
-// Importamos los png
+// --- IMÁGENES ---
 import batman from "../assets/avatars/batman.png";
 import spiderman from "../assets/avatars/spiderman.png";
 import ariel from "../assets/avatars/ariel.jpg";
@@ -10,169 +11,265 @@ import rapunzel from "../assets/avatars/rapunzel.jpg";
 import superman from "../assets/avatars/superman.png";
 import wonderwoman from "../assets/avatars/wonderwoman.png";
 
-import {
-  fetchPreguntaFacil,
-  fetchPredecir,
-  fetchFaciles,
-} from "../services/preguntas";
+const DICCIONARIO_AVATARES = {
+  batman: batman,
+  spiderman: spiderman,
+  ariel: ariel,
+  capitanAmerica: capitanAmerica,
+  cenicienta: cenicienta,
+  rapunzel: rapunzel,
+  superman: superman,
+  wonderwoman: wonderwoman,
+  default: batman,
+};
+const CODIGOS_DISPONIBLES = Object.keys(DICCIONARIO_AVATARES).filter(
+  (k) => k !== "default",
+);
 
-const AVATARES = [
-  batman,
-  spiderman,
-  superman,
-  capitanAmerica,
-  wonderwoman,
-  cenicienta,
-  rapunzel,
-  ariel,
-];
+function VistaInicio({ onIniciar }) {
+  const [listaUsuarios, setListaUsuarios] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [p1Id, setP1Id] = useState("");
+  const [p2Id, setP2Id] = useState("");
 
-function VistaInicio({ onIniciar, preguntas, setPreguntas }) {
-  const [p1Nombre, setP1Nombre] = useState("");
-  const [p2Nombre, setP2Nombre] = useState("");
-  const [p1Avatar, setP1Avatar] = useState(AVATARES[0]);
-  const [p2Avatar, setP2Avatar] = useState(AVATARES[1]);
-  const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  // Modal
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [creandoPara, setCreandoPara] = useState(null);
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoAvatar, setNuevoAvatar] = useState(CODIGOS_DISPONIBLES[0]);
 
-  const manejarInicio = () => {
-    if (!p1Nombre.trim() || !p2Nombre.trim()) {
-      setMostrarAlerta(true);
-      setTimeout(() => setMostrarAlerta(false), 3000);
-      return;
+  // Carga inicial
+  const cargarDatos = async () => {
+    setCargando(true);
+    console.log("Cargando usuarios...");
+    const usuarios = await fetchUsuarios();
+    console.log("Usuarios cargados:", usuarios);
+    setListaUsuarios(usuarios);
+    setCargando(false);
+  };
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  const usuarioP1 = listaUsuarios.find((u) => u.id_usuario.toString() === p1Id);
+  const usuarioP2 = listaUsuarios.find((u) => u.id_usuario.toString() === p2Id);
+
+  const manejarGuardarNuevo = async () => {
+    if (!nuevoNombre.trim()) return alert("¡Escribe un nombre!");
+    try {
+      const nuevo = await crearUsuario(nuevoNombre, nuevoAvatar);
+      console.log("Nuevo usuario creado: ", nuevo);
+
+      // Detecta si la API devolvió el usuario directo o anidado
+      const usuarioCreado = nuevo?.usuario ?? nuevo;
+
+      if (!usuarioCreado || !usuarioCreado.Correcto) {
+        alert("No se pudo crear el usuario. Revisa el backend.");
+        return;
+      }
+
+      // Refresca la lista y selecciona según quién abrió el modal
+      cerrarModal();
+      await cargarDatos();
+      const idStr = usuarioCreado.id_usuario.toString();
+      if (creandoPara === "p1") setP1Id(idStr);
+      if (creandoPara === "p2") setP2Id(idStr);
+    } catch (e) {
+      //console.error("Error al crear usuario:", e);
+      //alert("Error al crear usuario.");
     }
+  };
+
+  const abrirModal = (jugador) => {
+    setCreandoPara(jugador);
+    setNuevoNombre("");
+    setNuevoAvatar(CODIGOS_DISPONIBLES[0]);
+    setMostrarModal(true);
+  };
+
+  const cerrarModal = () => {
+    console.log("Cerrando modal");
+    setMostrarModal(false);
+    setCreandoPara(null);
+  };
+
+  const manejarInicioJuego = () => {
+    if (!usuarioP1 || !usuarioP2) return alert("¡Faltan pilotos!");
+    if (usuarioP1.id_usuario === usuarioP2.id_usuario)
+      return alert("¡Elijan distintos!");
+
     onIniciar({
-      p1: { nombre: p1Nombre, avatar: p1Avatar },
-      p2: { nombre: p2Nombre, avatar: p2Avatar },
+      p1: {
+        nombre: usuarioP1.nickname,
+        avatar: DICCIONARIO_AVATARES[usuarioP1.avatar_code],
+        id_usuario: usuarioP1.id_usuario,
+      },
+      p2: {
+        nombre: usuarioP2.nickname,
+        avatar: DICCIONARIO_AVATARES[usuarioP2.avatar_code],
+        id_usuario: usuarioP2.id_usuario,
+      },
     });
   };
 
-  const [preguntaBD, setPreguntaBD] = useState(null);
-
-  useEffect(() => {
-    console.log(
-      "Componente VistaInicio montado y cargando preguntas iniciales",
-    );
-    const cargarIniciales = async () => {
-      try {
-        const preguntasIniciales = await fetchFaciles();
-        console.log(preguntasIniciales);
-        setPreguntas((prev) => [preguntasIniciales]);
-      } catch (e) {
-        console.error("Error cargando preguntas iniciales:", e);
-      }
-    };
-    cargarIniciales();
-  }, []);
-
-  useEffect(() => {
-    if (preguntaBD) {
-      console.log("Pregunta cargada desde la base de datos:", preguntaBD);
-      console.log("Pregunta: ", preguntaBD.Pregunta);
-      console.log("Nivel:", preguntaBD.Nivel);
-    }
-  }, [preguntaBD]);
-
   return (
-    <div className="inicio-container">
-      {/* Fondo decorativo (Blobs) */}
-      <div className="blob blob-1"></div>
-      <div className="blob blob-2"></div>
-
-      {/* Header */}
-      <header className="header-inicio">
-        <div className="badge-pilotos">
-          <div className="icon-badge">
+    <div className="contenedor-inicio">
+      <header className="header-principal">
+        <div className="badge-escuela">
+          <div className="icono-badge">
             <span className="material-symbols-outlined">sports_score</span>
           </div>
-          <span className="text-badge">Escuela de Pilotos</span>
+          <h2>Escuela de Pilotos</h2>
         </div>
-        <h1 className="titulo-juego">QUIZ RACING</h1>
+        <h1 className="titulo-kawaii">QUIZ RACING</h1>
       </header>
 
-      <button
-        onClick={async () => {
-          const preguntaNueva = await fetchPredecir(3.67, 120);
-          console.log("Pregunta nueva cargada:", preguntaNueva);
-          setPreguntaBD(preguntaNueva);
-        }}
-      >
-        Cargar pregunta predecir
-      </button>
+      <main className="area-seleccion">
+        {/* JUGADOR 1 (ROSA) */}
+        <div className="tarjeta-jugador rosa">
+          <div className="etiqueta-jugador">JUGADOR 1</div>
 
-      <button
-        onClick={() => {
-          console.log("Cargando preguntas cola", preguntaBD);
-          console.log("Estado preguntas:", preguntas[0][0]);
-        }}
-      >
-        cargar preguntas cola
-      </button>
-
-      <div className="seleccion-jugadores">
-        {/* JUGADOR 1 */}
-        <div className="card-jugador p1">
-          <div className="tag-jugador">JUGADOR 1</div>
-
-          <div className="mt-4">
-            <label className="input-label">¿Cómo te llamas?</label>
-            <input
-              type="text"
-              placeholder="Nombre..."
-              value={p1Nombre}
-              onChange={(e) => setP1Nombre(e.target.value)}
-              maxLength={10}
-            />
-          </div>
-          <span className="input-label">Elige tu avatar:</span>
-          <div className="grid-avatares">
-            {AVATARES.map((av, index) => (
+          <div className="contenido-tarjeta">
+            <label>Selecciona Piloto:</label>
+            <div className="fila-input">
+              <select value={p1Id} onChange={(e) => setP1Id(e.target.value)}>
+                <option disabled value="">
+                  Elegir...
+                </option>
+                {listaUsuarios.map((u) => (
+                  <option key={u.id_usuario} value={u.id_usuario}>
+                    {u.nickname}
+                  </option>
+                ))}
+              </select>
               <button
-                key={index}
-                className={`btn-avatar ${
-                  p1Avatar === av ? "seleccionado" : ""
-                }`}
-                onClick={() => setP1Avatar(av)}
+                onClick={() => abrirModal("p1")}
+                className="btn-nuevo rosa"
+                title="Crear Nuevo"
               >
-                <img src={av} alt="avatar" />
+                +
               </button>
-            ))}
+            </div>
+
+            <div className="area-avatar rosa">
+              {usuarioP1 ? (
+                <div className="avatar-display">
+                  <img
+                    src={DICCIONARIO_AVATARES[usuarioP1.avatar_code]}
+                    alt="Avatar"
+                  />
+                  <h3>{usuarioP1.nickname}</h3>
+                  <span className="badge-nivel">
+                    NIVEL {Math.floor(usuarioP1.puntos_totales / 1000) + 1}
+                  </span>
+                </div>
+              ) : (
+                <div className="avatar-placeholder">
+                  <span className="material-symbols-outlined">
+                    account_circle
+                  </span>
+                  <p>¿Quién eres?</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* VS Badge Central */}
-        <div className="vs-badge">
-          <span className="vs-text">VS</span>
+        {/* VS */}
+        <div className="vs-central">VS</div>
+
+        {/* JUGADOR 2 (VERDE) */}
+        <div className="tarjeta-jugador verde">
+          <div className="etiqueta-jugador">JUGADOR 2</div>
+
+          <div className="contenido-tarjeta">
+            <label>Selecciona Piloto:</label>
+            <div className="fila-input">
+              <select value={p2Id} onChange={(e) => setP2Id(e.target.value)}>
+                <option disabled value="">
+                  Elegir...
+                </option>
+                {listaUsuarios.map((u) => (
+                  <option key={u.id_usuario} value={u.id_usuario}>
+                    {u.nickname}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => abrirModal("p2")}
+                className="btn-nuevo verde"
+                title="Crear Nuevo"
+              >
+                +
+              </button>
+            </div>
+
+            <div className="area-avatar verde">
+              {usuarioP2 ? (
+                <div className="avatar-display">
+                  <img
+                    src={DICCIONARIO_AVATARES[usuarioP2.avatar_code]}
+                    alt="Avatar"
+                  />
+                  <h3>{usuarioP2.nickname}</h3>
+                  <span className="badge-nivel">
+                    NIVEL {Math.floor(usuarioP2.puntos_totales / 1000) + 1}
+                  </span>
+                </div>
+              ) : (
+                <div className="avatar-placeholder">
+                  <span className="material-symbols-outlined">
+                    account_circle
+                  </span>
+                  <p>¿Quién eres?</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+      </main>
 
-        {/* Tarjeta JUGADOR 2 (Green) */}
-        <div className="card-jugador p2">
-          <div className="tag-jugador">JUGADOR 2</div>
+      <button
+        onClick={manejarInicioJuego}
+        className={`btn-comenzar ${!usuarioP1 || !usuarioP2 ? "deshabilitado" : ""}`}
+        disabled={!usuarioP1 || !usuarioP2}
+      >
+        ¡A CORRER! 🏁
+      </button>
 
-          <div className="mt-4">
-            <label className="input-label">¿Cómo te llamas?</label>
+      {/* MODAL */}
+      {mostrarModal && (
+        <div className="modal-fondo">
+          <div className="modal-caja">
+            <h2>✨ NUEVO PILOTO ✨</h2>
             <input
+              autoFocus
               type="text"
               placeholder="Nombre..."
-              value={p2Nombre}
-              onChange={(e) => setP2Nombre(e.target.value)}
+              value={nuevoNombre}
+              onChange={(e) => setNuevoNombre(e.target.value)}
               maxLength={10}
             />
-          </div>
 
-          <div>
-            <span className="input-label">Elige tu avatar:</span>
-            <div className="grid-avatares">
-              {AVATARES.map((av, index) => (
-                <button
-                  key={index}
-                  className={`btn-avatar ${
-                    p2Avatar === av ? "seleccionado" : ""
-                  }`}
-                  onClick={() => setP2Avatar(av)}
-                >
-                  <img src={av} alt="avatar" />
-                </button>
+            <p className="label-foto">ELIGE TU FOTO:</p>
+            <div className="grid-avatares-modal">
+              {CODIGOS_DISPONIBLES.map((codigo) => (
+                <img
+                  key={codigo}
+                  src={DICCIONARIO_AVATARES[codigo]}
+                  className={nuevoAvatar === codigo ? "seleccionado" : ""}
+                  onClick={() => setNuevoAvatar(codigo)}
+                />
               ))}
+            </div>
+
+            <div className="botones-modal">
+              <button onClick={cerrarModal} className="btn-cancelar">
+                Cancelar
+              </button>
+              <button onClick={manejarGuardarNuevo} className="btn-guardar">
+                ¡GUARDAR!
+              </button>
             </div>
           </div>
         </div>
