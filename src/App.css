@@ -521,17 +521,26 @@ select {
   top: 10px;
 }
 .nivel-badge {
-  background: white;
-  color: var(--secondary-pink);
+  background-color: #a0c4ff; 
+  color: white;
+  border: 4px solid white;
   padding: 5px 20px;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 0.8rem;
-  margin-bottom: -15px;
-  z-index: 2;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 999px; 
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+
+  /* Sombra suave y brillo */
+  box-shadow:
+    0 4px 6px rgba(255, 184, 178, 0.3),
+    /* Sombra rosa */ 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Sombra difusa */
+
+  margin-bottom: 15px; /* Más espacio con las Rondas */
+  z-index: 10;
+  transform: translateY(5px); /* Ajuste fino de posición */
 }
-.timer-reloj {
+/*.timer-reloj {
   width: 90px;
   height: 90px;
   background: white;
@@ -1392,4 +1401,206 @@ select {
   font-size: 0.9rem;
   font-weight: 700;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================
+   6. NUEVA BARRA DE RONDAS 
+   ========================================= */
+
+.hud-central-nuevo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+  margin: 10px 0 20px 0;
+  position: relative;
+}
+
+.label-rondas {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: #a0aec0;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* --- BARRA DE FONDO --- */
+.barra-track-container {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.linea-fondo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  z-index: 0;
+}
+
+.parte-normal {
+  width: 50%;
+  height: 100%;
+  background-color: #e5e7eb;
+}
+.parte-ia {
+  width: 50%;
+  height: 100%;
+  background-color: #fef08a;
+} /* Amarillo suave */
+
+.linea-progreso {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 10px;
+  background-color: #a2e3c4; /* Verde Mint */
+  border-radius: 999px 0 0 999px;
+  z-index: 1;
+  transition: width 0.5s ease;
+}
+
+/* --- NODOS (BOLITAS) --- */
+.nodo-ronda {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Estilo: Check (Ronda Pasada) */
+.nodo-ronda.completado {
+  width: 24px;
+  height: 24px;
+  background-color: #a2e3c4;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-size: 14px;
+}
+
+.nodo-ronda.completado.fase-ia {
+  background-color: #facc15; /* Amarillo intenso */
+  border-color: #fefce8; /* Borde crema */
+  color: #713f12; /* Icono café oscuro */
+}
+
+/* Estilo: Actual (Ronda Presente) */
+.nodo-ronda.actual {
+  width: 36px;
+  height: 36px;
+  background-color: #a2e3c4;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  font-weight: 900;
+  font-size: 14px;
+  transform: scale(1.1);
+}
+
+/* Estilo: Futuro (Puntito) */
+.nodo-ronda.futuro {
+  width: 16px;
+  height: 16px;
+  background-color: #e5e7eb;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+/* Estilo: IA (Especial Ronda 6) */
+.nodo-ronda.ia {
+  width: 32px;
+  height: 32px;
+  background-color: #facc15; /* Amarillo intenso */
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.6);
+  color: #713f12;
+  font-size: 10px;
+  font-weight: 900;
+}
+.nodo-ronda.ia.futuro {
+  opacity: 0.6;
+  box-shadow: none;
+}
+.nodo-ronda.ia-futuro-simple {
+  background-color: #fde047; /* Amarillo más claro */
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+/* --- TIMER NUEVO --- */
+.timer-nuevo-container {
+  margin-top: 10px;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timer-nuevo-bg {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 184, 178, 0.2);
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+.timer-circulo {
+  position: relative;
+  z-index: 10;
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  border-radius: 50%;
+  border: 6px solid #ffb8b2; /* Color primario */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
+}
+
+.timer-numero {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #4a4a4a;
+  line-height: 1;
+}
+
+.timer-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #a0aec0;
+  text-transform: uppercase;
+}
+
+/* Ocultar el HUD viejo del centro */
+.centro-info {
+  display: none !important;
 }
