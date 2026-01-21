@@ -39,6 +39,7 @@ function VistaInicio({ onIniciar }) {
   const [nuevoNombre, setNuevoNombre] = useState("");
   const [nuevoAvatar, setNuevoAvatar] = useState(CODIGOS_DISPONIBLES[0]);
   const [modalBoard, setModalBoard] = useState(null);
+  const [ultimoUsuarioCreado, setUltimoUsuarioCreado] = useState(null);
 
   // Carga inicial
   const cargarDatos = async () => {
@@ -53,32 +54,42 @@ function VistaInicio({ onIniciar }) {
     cargarDatos();
   }, []);
 
+  // Efecto para seleccionar automáticamente al usuario recién creado
+  useEffect(() => {
+    if (ultimoUsuarioCreado && listaUsuarios.length > 0) {
+      const usuarioEncontrado = listaUsuarios.find(u => u.nickname === ultimoUsuarioCreado.nombre);
+      if (usuarioEncontrado) {
+        const idStr = usuarioEncontrado.id_usuario.toString();
+        if (ultimoUsuarioCreado.jugador === 'p1') {
+          setP1Id(idStr);
+        } else {
+          setP2Id(idStr);
+        }
+        // Limpiamos el estado para que no se vuelva a ejecutar
+        setUltimoUsuarioCreado(null);
+      }
+    }
+  }, [listaUsuarios, ultimoUsuarioCreado]);
+
   const usuarioP1 = listaUsuarios.find((u) => u.id_usuario.toString() === p1Id);
   const usuarioP2 = listaUsuarios.find((u) => u.id_usuario.toString() === p2Id);
 
   const manejarGuardarNuevo = async () => {
     if (!nuevoNombre.trim()) return alert("¡Escribe un nombre!");
     try {
-      const nuevo = await crearUsuario(nuevoNombre, nuevoAvatar);
-      console.log("Nuevo usuario creado: ", nuevo);
+      const respuestaAPI = await crearUsuario(nuevoNombre, nuevoAvatar);
 
-      // Detecta si la API devolvió el usuario directo o anidado
-      const usuarioCreado = nuevo?.usuario ?? nuevo;
-
-      if (!usuarioCreado || !usuarioCreado.Correcto) {
+      if (respuestaAPI) {
+        // Guardamos el nombre y para quién se creó, para usarlo en el useEffect
+        setUltimoUsuarioCreado({ nombre: nuevoNombre, jugador: creandoPara });
+        cerrarModal();
+        await cargarDatos(); // Esto disparará el useEffect de arriba
+      } else {
         alert("No se pudo crear el usuario. Revisa el backend.");
-        return;
       }
-
-      // Refresca la lista y selecciona según quién abrió el modal
-      cerrarModal();
-      await cargarDatos();
-      const idStr = usuarioCreado.id_usuario.toString();
-      if (creandoPara === "p1") setP1Id(idStr);
-      if (creandoPara === "p2") setP2Id(idStr);
     } catch (e) {
-      //console.error("Error al crear usuario:", e);
-      //alert("Error al crear usuario.");
+      console.error("Error al crear usuario:", e);
+      alert("Error al crear usuario.");
     }
   };
 
@@ -93,6 +104,7 @@ function VistaInicio({ onIniciar }) {
     console.log("Cerrando modal");
     setMostrarModal(false);
     setCreandoPara(null);
+    setNuevoNombre(""); // Limpiamos el nombre al cerrar
   };
 
   const manejarInicioJuego = () => {
