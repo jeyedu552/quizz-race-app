@@ -10,6 +10,8 @@ function VistaTrivia({
   jugadores,
   loadingPregunta,
   shortTimer,
+  opcionSeleccionada,
+  esCorrecta,
 }) {
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ""}`}>
@@ -127,16 +129,16 @@ function VistaTrivia({
             !jugadorActivo || loadingPregunta ? "disabled" : ""
           }`}
         >
-          <div className="opcion roja" data-letra="A">
+          <div className={`opcion roja ${opcionSeleccionada === 'A' ? (esCorrecta ? 'seleccionada-correcta' : 'seleccionada-incorrecta') : ''}`} data-letra="A">
             {pregunta?.Opcion_A}
           </div>
-          <div className="opcion azul" data-letra="B">
+          <div className={`opcion azul ${opcionSeleccionada === 'B' ? (esCorrecta ? 'seleccionada-correcta' : 'seleccionada-incorrecta') : ''}`} data-letra="B">
             {pregunta?.Opcion_B}
           </div>
-          <div className="opcion verde" data-letra="C">
+          <div className={`opcion verde ${opcionSeleccionada === 'C' ? (esCorrecta ? 'seleccionada-correcta' : 'seleccionada-incorrecta') : ''}`} data-letra="C">
             {pregunta?.Opcion_C}
           </div>
-          <div className="opcion amarilla" data-letra="D">
+          <div className={`opcion amarilla ${opcionSeleccionada === 'D' ? (esCorrecta ? 'seleccionada-correcta' : 'seleccionada-incorrecta') : ''}`} data-letra="D">
             {pregunta?.Opcion_D}
           </div>
         </div>

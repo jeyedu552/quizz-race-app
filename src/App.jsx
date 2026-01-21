@@ -37,6 +37,8 @@ function App() {
   const [timer, setTimer] = useState(30);
   const [feedback, setFeedback] = useState(null);
   const [shortTimer, setShortTimer] = useState(null); // cronómetro de 3s para el jugador activo
+  const [opcionSeleccionada, setOpcionSeleccionada] = useState(null);
+  const [esCorrecta, setEsCorrecta] = useState(null);
 
   // Minijuego
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
@@ -77,6 +79,8 @@ function App() {
     let nueva;
     setJugadorActivo(null);
     setFeedback(null);
+    setOpcionSeleccionada(null);
+    setEsCorrecta(null);
     setTimer(30);
     setLoadingPregunta(true);
 
@@ -304,6 +308,9 @@ function App() {
 
     const esCorrecto = textoUsuario === respuestaReal;
 
+    setOpcionSeleccionada(letraUsuario);
+    setEsCorrecta(esCorrecto);
+
     setStats((prev) => {
       const jugador = prev[jugadorActivo];
       return {
@@ -387,6 +394,8 @@ function App() {
       feedback={feedback}
       loadingPregunta={loadingPregunta}
       shortTimer={shortTimer}
+      opcionSeleccionada={opcionSeleccionada}
+      esCorrecta={esCorrecta}
       // Soporte híbrido para Nivel
       nivelNombre={
         preguntaActual

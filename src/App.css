@@ -662,6 +662,22 @@ body {
 .opcion.amarilla {
   background: var(--btn-amarillo);
 }
+
+/* Estilos para opciones seleccionadas */
+.opcion.seleccionada-correcta {
+  background: var(--primary) !important;
+  color: white !important;
+  border: 3px solid var(--primary) !important;
+  box-shadow: 0 0 15px rgba(43, 238, 140, 0.5) !important;
+}
+
+.opcion.seleccionada-incorrecta {
+  background: #e74c3c !important;
+  color: white !important;
+  border: 3px solid #e74c3c !important;
+  box-shadow: 0 0 15px rgba(231, 76, 60, 0.5) !important;
+}
+
 .opciones-grid.disabled {
   opacity: 0.5;
   pointer-events: none;
@@ -691,7 +707,7 @@ body {
 /* Feedback */
 .feedback-flotante {
   position: absolute;
-  top: -10px;
+  top: -5px;
   left: 50%;
   transform: translateX(-50%);
   background: white;
