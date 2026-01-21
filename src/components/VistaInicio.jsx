@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ModelLeaderboard from "./modelLeaderboard";
 import { fetchUsuarios, crearUsuario } from "../services/preguntas";
 
 // --- IMÁGENES ---
@@ -37,6 +38,7 @@ function VistaInicio({ onIniciar }) {
   const [creandoPara, setCreandoPara] = useState(null);
   const [nuevoNombre, setNuevoNombre] = useState("");
   const [nuevoAvatar, setNuevoAvatar] = useState(CODIGOS_DISPONIBLES[0]);
+  const [modalBoard, setModalBoard] = useState(null);
 
   // Carga inicial
   const cargarDatos = async () => {
@@ -237,6 +239,13 @@ function VistaInicio({ onIniciar }) {
         ¡A CORRER! 🏁
       </button>
 
+      {/* Botón Leaderboard */}
+      <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
+        <button className="btn-leaderboard" onClick={() => setModalBoard(true)}>
+          Leaderboard
+        </button>
+      </div>
+
       {/* MODAL */}
       {mostrarModal && (
         <div className="modal-fondo">
@@ -273,6 +282,14 @@ function VistaInicio({ onIniciar }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal Leaderboard */}
+      {modalBoard && (
+        <ModelLeaderboard
+          usuarios={listaUsuarios}
+          onClose={() => setModalBoard(false)}
+        />
       )}
     </div>
   );
