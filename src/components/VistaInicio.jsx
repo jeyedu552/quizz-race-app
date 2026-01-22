@@ -27,9 +27,9 @@ const CODIGOS_DISPONIBLES = Object.keys(DICCIONARIO_AVATARES).filter(
   (k) => k !== "default",
 );
 
-function VistaInicio({ onIniciar }) {
+function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volverDesdeR = false, onUsuariosCargados = null }) {
   const [listaUsuarios, setListaUsuarios] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [_cargando, setCargando] = useState(true);
   const [p1Id, setP1Id] = useState("");
   const [p2Id, setP2Id] = useState("");
 
@@ -49,10 +49,22 @@ function VistaInicio({ onIniciar }) {
     console.log("Usuarios cargados:", usuarios);
     setListaUsuarios(usuarios);
     setCargando(false);
+    // Si venimos por la tecla R, notificamos al padre que los usuarios ya cargaron
+    try {
+      if (volverDesdeR && typeof onUsuariosCargados === 'function') onUsuariosCargados();
+    } catch (e) {
+      console.error('Error notificando carga de usuarios:', e);
+    }
   };
   useEffect(() => {
     cargarDatos();
   }, []);
+
+  // Si el padre (App) pasa ids iniciales (vienen cuando se vuelve desde GameOver), los usamos
+  useEffect(() => {
+    if (initialP1Id) setP1Id(initialP1Id);
+    if (initialP2Id) setP2Id(initialP2Id);
+  }, [initialP1Id, initialP2Id]);
 
   // Efecto para seleccionar automáticamente al usuario recién creado
   useEffect(() => {
@@ -126,8 +138,30 @@ function VistaInicio({ onIniciar }) {
     });
   };
 
+  // Atajo de teclado: 'p' para iniciar partida (si los jugadores están seleccionados)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.repeat) return;
+      if (e.key === 'p' || e.key === 'P') {
+        manejarInicioJuego();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [p1Id, p2Id, listaUsuarios]);
+
   return (
     <div className="contenedor-inicio">
+      {/* Overlay cuando volvemos desde R y se están cargando los usuarios */}
+      {volverDesdeR && _cargando && (
+        <div className="modal-fondo">
+          <div className="modal-caja">
+            <h2>Cargando jugadores</h2>
+            <p>Espere un momento mientras se cargan los pilotos...</p>
+          </div>
+        </div>
+      )}
+
       <header className="header-principal">
         <div className="badge-escuela">
           <div className="icono-badge">
@@ -278,6 +312,7 @@ function VistaInicio({ onIniciar }) {
                 <img
                   key={codigo}
                   src={DICCIONARIO_AVATARES[codigo]}
+                  alt={codigo}
                   className={nuevoAvatar === codigo ? "seleccionado" : ""}
                   onClick={() => setNuevoAvatar(codigo)}
                 />

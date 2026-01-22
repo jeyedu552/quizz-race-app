@@ -30,6 +30,9 @@ function App() {
     p2: { nombre: "Jugador 2", avatar: "👽" },
   });
 
+  // Estado para recordar la última selección de IDs de jugadores
+  const [ultimaSeleccionIds, setUltimaSeleccionIds] = useState(null);
+
   // --- ESTADÍSTICAS Y PUNTAJES ---
   const [stats, setStats] = useState({
     p1: { puntos: 0, aciertos: 0, total_respondidas: 0 },
@@ -48,54 +51,12 @@ function App() {
 
   // Referencias para métricas y control de intervalos
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]);
-  const tiempoInicioRef = useRef(Date.now());
+  const tiempoInicioRef = useRef(0);
   const timerRef = useRef(null);
   const shortTimerRef = useRef(null);
 
-  // --- INICIALIZACIÓN DEL JUEGO ---
-  const iniciarJuego = (datosJugadores) => {
-    setInfoJugadores(datosJugadores);
-    setFase("Trivia");
-    cargarPregunta();
-  };
-
-  // Determina el nombre legible del nivel basado en su número
-  const obtenerNombreNivel = (nivelNum) => {
-    if (nivelNum === 1) return "🌱 FÁCIL";
-    if (nivelNum === 2) return "😐 MEDIO";
-    if (nivelNum === 3) return "🔥 DIFÍCIL";
-    if (nivelNum >= 4) return "⚡ EXTREMO";
-    return "NIVEL " + nivelNum;
-  };
-
-  // --- EFECTO: VIGILANTE DE LA CARRERA ---
-  // Monitorea el progreso de los carros y determina si hay un ganador.
-  // Se encarga de asignar los puntos y realizar la transición a la siguiente fase.
-  useEffect(() => {
-    if (fase === "Carrera") {
-      // Se verifica si algún jugador alcanzó la meta (95% o más)
-      let ganador = null;
-      if (progresoCarro.p1 >= 95) ganador = "p1";
-      else if (progresoCarro.p2 >= 95) ganador = "p2";
-
-      if (ganador) {
-        // 1. Se anuncia el ganador y se actualizan los puntajes (+200 pts)
-        alert(`¡GANÓ ${infoJugadores[ganador].nombre}! +200 PTS`);
-        setStats((s) => ({
-          ...s,
-          [ganador]: { ...s[ganador], puntos: s[ganador].puntos + 200 },
-        }));
-
-        // 2. Se reinicia el estado de la carrera y se avanza de fase
-        setFase("Trivia");
-        setRonda(6);
-        setProgresoCarro({ p1: 0, p2: 0 });
-
-        // 3. Se fuerza la carga de preguntas para la Ronda 6
-        cargarPregunta(6);
-      }
-    }
-  }, [progresoCarro, fase, infoJugadores]);
+  // Estado que indica que el usuario pidió volver al inicio con la tecla R y que debemos mostrar "cargando jugadores"
+  const [volverCargando, setVolverCargando] = useState(false);
 
   // --- LÓGICA DE CARGA Y SELECCIÓN DE PREGUNTAS ---
   // Gestiona la obtención de preguntas desde el servicio o el fallback local.
@@ -204,47 +165,105 @@ function App() {
     }
   };
 
-  // Maneja el evento cuando el tiempo de respuesta global se agota
-  const manejarTiempoAgotado = () => {
-    clearInterval(timerRef.current);
-    setFeedback("Tiempo");
-    setTimeout(() => {
-      setFeedback(null);
-      setLoadingPregunta(true);
-      avanzarSiguientePaso();
-    }, 1500);
-  };
-
-  // Maneja el evento cuando el tiempo de turno (3s) se agota
-  const manejarShortTimerAgotado = () => {
-    setJugadorActivo(null);
-    setShortTimer(null);
-    clearInterval(shortTimerRef.current);
-    clearInterval(timerRef.current);
-    setFeedback("Tiempo");
-    setTimeout(() => {
-      setFeedback(null);
-      setLoadingPregunta(true);
-      avanzarSiguientePaso();
-    }, 1500);
-  };
-
-  // Determina el flujo del juego (Siguiente Ronda, Carrera o Fin del Juego)
-  const avanzarSiguientePaso = () => {
-    // Caso especial: Fin de la Fase 1
-    if (ronda === 5) {
-      setFase("Carrera");
-      setProgresoCarro({ p1: 0, p2: 0 });
-      setLoadingPregunta(false);
-    // Caso especial: Fin del Juego
-    } else if (ronda === 10) {
-      setFase("Game_Over");
-      setLoadingPregunta(false);
-    } else {
-      setRonda((r) => r + 1);
-      cargarPregunta();
+  // --- INICIALIZACIÓN DEL JUEGO ---
+  const iniciarJuego = (datosJugadores) => {
+    setInfoJugadores(datosJugadores);
+    // Guardamos los ids seleccionados para poder preseleccionarlos al volver al inicio
+    try {
+      setUltimaSeleccionIds({
+        p1Id: datosJugadores.p1.id_usuario.toString(),
+        p2Id: datosJugadores.p2.id_usuario.toString(),
+      });
+    } catch {
+      // en caso de que no existan id_usuario (por seguridad)
+      setUltimaSeleccionIds(null);
     }
+    setFase("Trivia");
+    cargarPregunta();
   };
+
+  // Determina el nombre legible del nivel basado en su número
+  const obtenerNombreNivel = (nivelNum) => {
+    if (nivelNum === 1) return "🌱 FÁCIL";
+    if (nivelNum === 2) return "😐 MEDIO";
+    if (nivelNum === 3) return "🔥 DIFÍCIL";
+    if (nivelNum >= 4) return "⚡ EXTREMO";
+    return "NIVEL " + nivelNum;
+  };
+
+  // --- EFECTO: VIGILANTE DE LA CARRERA ---
+  // Monitorea el progreso de los carros y determina si hay un ganador.
+  // Se encarga de asignar los puntos y realizar la transición a la siguiente fase.
+  useEffect(() => {
+    if (fase === "Carrera") {
+      // Se verifica si algún jugador alcanzó la meta (95% o más)
+      let ganador = null;
+      if (progresoCarro.p1 >= 95) ganador = "p1";
+      else if (progresoCarro.p2 >= 95) ganador = "p2";
+
+      if (ganador) {
+        // 1. Se anuncia el ganador y se actualizan los puntajes (+200 pts)
+        alert(`¡GANÓ ${infoJugadores[ganador].nombre}! +200 PTS`);
+        setStats((s) => ({
+          ...s,
+          [ganador]: { ...s[ganador], puntos: s[ganador].puntos + 200 },
+        }));
+
+        // 2. Se reinicia el estado de la carrera y se avanza de fase
+        setFase("Trivia");
+        setRonda(6);
+        setProgresoCarro({ p1: 0, p2: 0 });
+
+        // 3. Se fuerza la carga de preguntas para la Ronda 6
+        cargarPregunta(6);
+      }
+    }
+  }, [progresoCarro, fase, infoJugadores]);
+
+  // --- FUNCIÓN: AVANZAR SIGUIENTE PASO (fix: estaba faltando) ---
+  function avanzarSiguientePaso() {
+    // Evitar cambios si estamos cargando
+    if (loadingPregunta) return;
+
+    // Si estamos en Trivia manejamos la lógica de rondas y transiciones
+    if (fase === "Trivia") {
+      // Si estamos en las primeras 4 rondas -> avanzar normal
+      if (ronda < 5) {
+        const siguiente = ronda + 1;
+        setRonda(siguiente);
+        cargarPregunta(siguiente);
+      }
+      // Si acabamos la ronda 5 -> iniciar Carrera
+      else if (ronda === 5) {
+        // limpiar timers activos
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        if (shortTimerRef.current) {
+          clearInterval(shortTimerRef.current);
+          shortTimerRef.current = null;
+        }
+        setJugadorActivo(null);
+        setShortTimer(null);
+        setLoadingPregunta(false);
+        setFase("Carrera");
+        // La lógica de la carrera (cuando termine) se encargará de setRonda(6) y cargarPregunta(6)
+      }
+      // Rondas adaptativas 6-9 -> avanzar y cargar
+      else if (ronda >= 6 && ronda < 10) {
+        const siguiente = ronda + 1;
+        setRonda(siguiente);
+        cargarPregunta(siguiente);
+      }
+      // Si era la ronda 10 -> terminar juego
+      else if (ronda >= 10) {
+        setFase("Game_Over");
+      }
+    } else {
+      // Si no estamos en Trivia, no hacemos nada por ahora
+    }
+  }
 
   // --- CONTROLADOR DE EVENTOS: BOTÓN GRANDE ---
   // Gestiona la activación del turno en Trivia o el movimiento en Carrera.
@@ -361,6 +380,47 @@ function App() {
     }
   }, [fase]);
 
+  // --- ATALLO GLOBAL: tecla 'R' para volver siempre al Inicio (preservando jugadores) ---
+  useEffect(() => {
+    const handleKeyDownGlobal = (e) => {
+      if (e.repeat) return;
+      if (e.key === 'r' || e.key === 'R') {
+        // Mostrar mensaje de carga en la vista de Inicio
+        setVolverCargando(true);
+        // Limpiar timers e intervalos
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        if (shortTimerRef.current) {
+          clearInterval(shortTimerRef.current);
+          shortTimerRef.current = null;
+        }
+
+        // Reset estados de partido (mantener infoJugadores y ultimaSeleccionIds)
+        setPreguntaActual(null);
+        setRonda(1);
+        setIdsUsados([]);
+        setLoadingPregunta(false);
+        setJugadorActivo(null);
+        setFeedback(null);
+        setShortTimer(null);
+        setTimer(30);
+        setProgresoCarro({ p1: 0, p2: 0 });
+        setStats({
+          p1: { puntos: 0, aciertos: 0, total_respondidas: 0 },
+          p2: { puntos: 0, aciertos: 0, total_respondidas: 0 },
+        });
+
+        // Ir al menú Inicio
+        setFase('Inicio');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDownGlobal);
+    return () => window.removeEventListener('keydown', handleKeyDownGlobal);
+  }, []);
+
   // --- RENDERIZADO CONDICIONAL DE VISTAS ---
   if (fase === "Inicio")
     return (
@@ -368,10 +428,23 @@ function App() {
         onIniciar={iniciarJuego}
         preguntas={preguntas}
         setPreguntas={setPreguntas}
+        // Pasamos la última selección (si existe) para preseleccionar jugadores
+        initialP1Id={ultimaSeleccionIds ? ultimaSeleccionIds.p1Id : null}
+        initialP2Id={ultimaSeleccionIds ? ultimaSeleccionIds.p2Id : null}
+        // Indica si se volvió con R y se debe mostrar un mensaje mientras carga usuarios
+        volverDesdeR={volverCargando}
+        onUsuariosCargados={() => setVolverCargando(false)}
       />
     );
   if (fase === "Game_Over")
-    return <VistaGameOver stats={stats} jugadores={infoJugadores} />;
+    return (
+      <VistaGameOver
+        stats={stats}
+        jugadores={infoJugadores}
+        // Al volver al inicio queremos regresar a la fase Inicio (y VistaInicio usará las ids pasadas antes)
+        onVolverInicio={() => setFase("Inicio")}
+      />
+    );
   if (fase === "Carrera")
     return <VistaCarrera progreso={progresoCarro} jugadores={infoJugadores} />;
 
