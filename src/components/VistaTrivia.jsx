@@ -17,7 +17,8 @@ function VistaTrivia({
   ronda,
   shortTimer,
   nivelNombre,
-  usaIA
+  usaIA,
+  aciertosSeguidos
 }) {
 
   const totalRondas = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -28,11 +29,14 @@ function VistaTrivia({
 
   // Estado local para mostrar la alerta cuando el toggle cambia
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  const [mensajeAlerta, setMensajeAlerta] = useState('');
   const iaActivaAnterior = useRef(false);
+  const rondaAnterior = useRef(ronda);
 
   // Detectar cuando el toggle cambia a activado
   useEffect(() => {
     if (iaActiva && !iaActivaAnterior.current) {
+      setMensajeAlerta('Modo IA activado - Responde con cuidado');
       setMostrarAlerta(true);
       setTimeout(() => {
         setMostrarAlerta(false);
@@ -40,6 +44,32 @@ function VistaTrivia({
     }
     iaActivaAnterior.current = iaActiva;
   }, [iaActiva]);
+
+  // Alertas de aproximación: solo al INICIO de la ronda, verificando que las anteriores fueron correctas
+  useEffect(() => {
+    // Solo mostrar alertas cuando la ronda cambia (no durante la ronda actual)
+    if (ronda !== rondaAnterior.current) {
+      // Ronda 4: Si ya tiene 3 aciertos seguidos (respondió bien rondas 1, 2 y 3)
+      if (ronda === 4 && aciertosSeguidos === 3) {
+        setMensajeAlerta('🤖 Modo de IA aproximándose, 2 intentos más');
+        setMostrarAlerta(true);
+        setTimeout(() => {
+          setMostrarAlerta(false);
+        }, 3000);
+      }
+
+      // Ronda 5: Si ya tiene 4 aciertos seguidos (respondió bien rondas 1, 2, 3 y 4)
+      if (ronda === 5 && aciertosSeguidos === 4) {
+        setMensajeAlerta('🤖 Modo IA aproximándose, 1 intento más');
+        setMostrarAlerta(true);
+        setTimeout(() => {
+          setMostrarAlerta(false);
+        }, 3000);
+      }
+
+      rondaAnterior.current = ronda;
+    }
+  }, [ronda, aciertosSeguidos]);
 
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ''}`}>
@@ -189,7 +219,7 @@ function VistaTrivia({
         {mostrarAlerta && (
           <div className="alerta-ia-simple">
             <span className="alerta-ia-icono-simple">🤖</span>
-            <span className="alerta-ia-mensaje">Modo IA activado - Responde con cuidado</span>
+            <span className="alerta-ia-mensaje">{mensajeAlerta}</span>
           </div>
         )}
 

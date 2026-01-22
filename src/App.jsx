@@ -22,7 +22,8 @@ function App() {
   const [idsUsados, setIdsUsados] = useState([]);
   const [preguntas, setPreguntas] = useState([]);
   const [loadingPregunta, setLoadingPregunta] = useState(false);
-  const [usaIA, setUsaIA] = useState(false); 
+  const [usaIA, setUsaIA] = useState(false);
+  const [aciertosSeguidos, setAciertosSeguidos] = useState(0); // Trackear respuestas correctas consecutivas
 
   // --- CONFIGURACIÓN DE JUGADORES ---
   const [infoJugadores, setInfoJugadores] = useState({
@@ -325,6 +326,15 @@ function App() {
 
     const esCorrecto = textoUsuario === respuestaReal;
 
+    // Actualizar aciertos seguidos (solo en primeras 5 rondas)
+    if (rondaRef.current <= 5) {
+      if (esCorrecto) {
+        setAciertosSeguidos(prev => prev + 1);
+      } else {
+        setAciertosSeguidos(0); // Resetear si falla
+      }
+    }
+
     setStats((prev) => {
       const jugador = prev[jugadorActivo];
       return {
@@ -403,6 +413,7 @@ function App() {
           p1: { puntos: 0, aciertos: 0, total_respondidas: 0 },
           p2: { puntos: 0, aciertos: 0, total_respondidas: 0 },
         });
+        setAciertosSeguidos(0);
 
         setFase('Inicio');
       }
@@ -447,6 +458,7 @@ function App() {
       shortTimer={shortTimer}
       ronda={ronda}
       usaIA={usaIA}
+      aciertosSeguidos={aciertosSeguidos}
       nivelNombre={
         preguntaActual
           ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel)
