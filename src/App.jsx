@@ -46,11 +46,19 @@ function App() {
   // Estado del Minijuego de Carrera
   const [progresoCarro, setProgresoCarro] = useState({ p1: 0, p2: 0 });
 
+  const rondaRef = useRef(ronda);
+// SINCRONIZAR LA REFERENCIA
+  useEffect(() => {
+    rondaRef.current = ronda;
+  }, [ronda]);
+
+
   // Referencias para métricas y control de intervalos
   const [tiemposRespuesta, setTiemposRespuesta] = useState([]);
   const tiempoInicioRef = useRef(Date.now());
   const timerRef = useRef(null);
   const shortTimerRef = useRef(null);
+
 
   // --- INICIALIZACIÓN DEL JUEGO ---
   const iniciarJuego = (datosJugadores) => {
@@ -178,7 +186,6 @@ function App() {
         }
       }
     }
-
     // --- ASIGNACIÓN Y GESTIÓN DE ESTADO DE PREGUNTA ---
     if (nueva) {
       setPreguntaActual(nueva);
@@ -231,18 +238,22 @@ function App() {
 
   // Determina el flujo del juego (Siguiente Ronda, Carrera o Fin del Juego)
   const avanzarSiguientePaso = () => {
+    //Se usa la referencia para obtener el valor real de la ronda 
+    const rondaActualReal = rondaRef.current;
+
     // Caso especial: Fin de la Fase 1
-    if (ronda === 5) {
+    if (rondaActualReal === 5) {
       setFase("Carrera");
       setProgresoCarro({ p1: 0, p2: 0 });
       setLoadingPregunta(false);
     // Caso especial: Fin del Juego
-    } else if (ronda === 10) {
+    } else if (rondaActualReal === 10) {
       setFase("Game_Over");
       setLoadingPregunta(false);
     } else {
-      setRonda((r) => r + 1);
-      cargarPregunta();
+      const siguiente = rondaActualReal + 1;
+      setRonda(siguiente);
+      cargarPregunta(siguiente);
     }
   };
 
