@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Icono simple de check
 const CheckIcon = () => (
@@ -25,6 +25,21 @@ function VistaTrivia({
 
   // El toggle de IA se activa solo si usaIA es true Y el nivel NO es fácil
   const iaActiva = usaIA && nivelNombre && !nivelNombre.includes('FÁCIL');
+
+  // Estado local para mostrar la alerta cuando el toggle cambia
+  const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  const iaActivaAnterior = useRef(false);
+
+  // Detectar cuando el toggle cambia a activado
+  useEffect(() => {
+    if (iaActiva && !iaActivaAnterior.current) {
+      setMostrarAlerta(true);
+      setTimeout(() => {
+        setMostrarAlerta(false);
+      }, 3000);
+    }
+    iaActivaAnterior.current = iaActiva;
+  }, [iaActiva]);
 
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ''}`}>
@@ -167,6 +182,14 @@ function VistaTrivia({
             <div className="texto-feedback">
                 <span className="titulo-feed">¡TIEMPO AGOTADO!</span>
             </div>
+          </div>
+        )}
+
+        {/* Alerta de Modo IA Activado - Versión Simple */}
+        {mostrarAlerta && (
+          <div className="alerta-ia-simple">
+            <span className="alerta-ia-icono-simple">🤖</span>
+            <span className="alerta-ia-mensaje">Modo IA activado - Responde con cuidado</span>
           </div>
         )}
 
