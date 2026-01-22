@@ -11,6 +11,10 @@ import cenicienta from "../assets/avatars/cenicienta.jpg";
 import rapunzel from "../assets/avatars/rapunzel.jpg";
 import superman from "../assets/avatars/superman.png";
 import wonderwoman from "../assets/avatars/wonderwoman.png";
+import elsa from "../assets/avatars/elsa.jpg";
+import goku from "../assets/avatars/goku.jpg";
+import homero from "../assets/avatars/homero.jpg";
+import valiente from "../assets/avatars/valiente.jpg";
 
 const DICCIONARIO_AVATARES = {
   batman: batman,
@@ -21,6 +25,10 @@ const DICCIONARIO_AVATARES = {
   rapunzel: rapunzel,
   superman: superman,
   wonderwoman: wonderwoman,
+  elsa: elsa,
+  goku: goku,
+  homero: homero,
+  valiente: valiente,
   default: batman,
 };
 const CODIGOS_DISPONIBLES = Object.keys(DICCIONARIO_AVATARES).filter(

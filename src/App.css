@@ -375,15 +375,19 @@ select {
 }
 .modal-caja input {
   width: 100%;
+  box-sizing: border-box; /* 🔑 CLAVE */
   padding: 15px;
   font-size: 1.2rem;
   border: 3px solid #ddd;
   border-radius: 15px;
-  margin: 20px 0;
+  margin: 20px auto; /* centra correctamente */
   text-align: center;
   font-weight: bold;
   outline: none;
+  display: block;
 }
+
+
 .modal-caja input:focus {
   border-color: #ffd700;
 }
