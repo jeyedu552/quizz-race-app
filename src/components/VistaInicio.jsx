@@ -54,6 +54,22 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
   const [nuevoAvatar, setNuevoAvatar] = useState(CODIGOS_DISPONIBLES[0]);
   const [modalBoard, setModalBoard] = useState(null);
   const [ultimoUsuarioCreado, setUltimoUsuarioCreado] = useState(null);
+  const [modalAyuda, setModalAyuda] = useState(false);
+  const [imagenActual, setImagenActual] = useState(0);
+
+  // Array de imágenes del hardware
+  const imagenesHardware = [
+    { src: '/principal.jpeg', alt: 'Hardware con botones principal', titulo: 'Control Principal' },
+    { src: '/play_reset.jpeg', alt: 'Botones Play y Reset', titulo: 'Botones de Control' }
+  ];
+
+  const siguienteImagen = () => {
+    setImagenActual((prev) => (prev + 1) % imagenesHardware.length);
+  };
+
+  const anteriorImagen = () => {
+    setImagenActual((prev) => (prev - 1 + imagenesHardware.length) % imagenesHardware.length);
+  };
 
   // Carga inicial
   const cargarDatos = async () => {
@@ -352,6 +368,11 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
         </button>
       </div>
 
+      {/* Botón de Ayuda Flotante */}
+      <button className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)}>
+        ❓
+      </button>
+
       {/* MODAL CREAR USUARIO (Igual que antes) */}
       {mostrarModal && (
         <div className="modal-fondo">
@@ -397,6 +418,195 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
           usuarios={listaUsuarios}
           onClose={() => setModalBoard(false)}
         />
+      )}
+
+      {/* Modal de Ayuda */}
+      {modalAyuda && (
+        <div className="modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <button className="btn-cerrar-modal" onClick={() => setModalAyuda(false)}>
+              ✕
+            </button>
+            
+            <h2 className="titulo-ayuda">🏁 QUIZ RACING</h2>
+            
+            {/* Sección De Qué Trata */}
+            <div className="seccion-acerca">
+              <h3>🎯 ¿De qué trata el juego?</h3>
+              <p className="descripcion-juego">
+                <strong>Quiz Racing</strong> es un emocionante juego de trivia competitivo donde dos jugadores
+                compiten respondiendo preguntas de cultura general. Combina conocimiento con velocidad
+                en 3 fases épicas: <strong>Preguntas por turnos</strong>, <strong>Carrera de velocidad</strong> y 
+                <strong>Modo IA adaptativo</strong>. ¡El jugador con más puntos al final se corona campeón! 🏆
+              </p>
+            </div>
+
+            {/* Sección Hardware */}
+            <div className="seccion-hardware">
+              <h3>🕹️ Control del Juego</h3>
+              <div className="carrusel-hardware">
+                <button className="carrusel-btn prev" onClick={anteriorImagen} aria-label="Imagen anterior">
+                  ‹
+                </button>
+                
+                <div className="carrusel-contenedor">
+                  <img 
+                    src={imagenesHardware[imagenActual].src} 
+                    alt={imagenesHardware[imagenActual].alt}
+                    className="carrusel-imagen"
+                  />
+                  <p className="carrusel-titulo">{imagenesHardware[imagenActual].titulo}</p>
+                </div>
+                
+                <button className="carrusel-btn next" onClick={siguienteImagen} aria-label="Imagen siguiente">
+                  ›
+                </button>
+              </div>
+              
+              {/* Indicadores */}
+              <div className="carrusel-indicadores">
+                {imagenesHardware.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`indicador ${index === imagenActual ? 'activo' : ''}`}
+                    onClick={() => setImagenActual(index)}
+                    aria-label={`Ir a imagen ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Instrucciones Completas */}
+            <div className="seccion-instrucciones">
+              <h3>📋 Instrucciones Completas</h3>
+              <div className="instrucciones-grid">
+                
+                {/* PANTALLA INICIO */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">1</span>
+                  <div>
+                    <strong>Pantalla de Inicio</strong>
+                    <p>• Usa botones de colores (🔴🟢 para P1, 🔵🟡 para P2) para navegar<br/>
+                       • Presiona ESPACIO (P1) o ENTER (P2) para alternar foco<br/>
+                       • Tecla <kbd>P</kbd> para iniciar juego rápido</p>
+                  </div>
+                </div>
+
+                {/* FASE 1: TRIVIA */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">2</span>
+                  <div>
+                    <strong>Fase 1: Trivia (Rondas 1-5)</strong>
+                    <p>• Presiona tu BOTÓN GRANDE (ESPACIO/ENTER) para tomar turno<br/>
+                       • Tienes 3 segundos para responder con botones de colores<br/>
+                       • +100 puntos por acierto | 30 segundos por pregunta<br/>
+                       • ⚠️ Si no respondes a tiempo, pierdes el turno</p>
+                  </div>
+                </div>
+
+                {/* FASE 2: CARRERA */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">3</span>
+                  <div>
+                    <strong>Fase 2: Carrera Rápida</strong>
+                    <p>• ¡Presiona tu BOTÓN GRANDE repetidamente para acelerar!<br/>
+                       • Tu kart avanza con cada toque rápido<br/>
+                       • El primero en llegar gana +200 puntos bonus 🏁<br/>
+                       • Efectos visuales de turbo al avanzar 💨</p>
+                  </div>
+                </div>
+
+                {/* FASE 3: MODO IA */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">4</span>
+                  <div>
+                    <strong>Fase 3: Modo IA (Rondas 6-10)</strong>
+                    <p>• Sistema inteligente ajusta dificultad según tu desempeño<br/>
+                       • Analiza tu velocidad de respuesta y porcentaje de aciertos<br/>
+                       • Preguntas más difíciles = más emoción<br/>
+                       • Mismo sistema de turnos y puntos</p>
+                  </div>
+                </div>
+
+                {/* CONTROLES */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">5</span>
+                  <div>
+                    <strong>Controles del Teclado</strong>
+                    <p>• <kbd>Botón Rojo</kbd>: Botón grande P1 (buzz in / acelerar)<br/>
+                       • <kbd>Botón Rojo</kbd>: Botón grande P2 (buzz in / acelerar)<br/>
+                       • <kbd>A</kbd>: Respuesta A (Rojo 🔴)<br/>
+                       • <kbd>B</kbd>: Respuesta B (Azul 🔵)<br/>
+                       • <kbd>C</kbd>: Respuesta C (Verde 🟢)<br/>
+                       • <kbd>D</kbd>: Respuesta D (Amarillo 🟡)<br/>
+                       • <kbd>R</kbd>: Reiniciar juego desde cualquier pantalla</p>
+                  </div>
+                </div>
+
+                {/* SISTEMA DE PUNTOS */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">6</span>
+                  <div>
+                    <strong>Sistema de Puntuación</strong>
+                    <p>• Respuesta correcta: +100 puntos ⭐<br/>
+                       • Ganador de carrera: +200 puntos bonus 🏁<br/>
+                       • Progreso guardado en perfil permanente<br/>
+                       • Sube de nivel cada 1000 puntos acumulados<br/>
+                       • Ver ranking en el Leaderboard 🏆</p>
+                  </div>
+                </div>
+
+                {/* CARACTERÍSTICAS */}
+                <div className="instruccion-item">
+                  <span className="numero-paso">7</span>
+                  <div>
+                    <strong>Características Especiales</strong>
+                    <p>• Perfiles de usuario persistentes con avatares<br/>
+                       • Tabla de clasificación global<br/>
+                       • Feedback visual inmediato (✓ / ✗)<br/>
+                       • Animaciones y efectos kawaii<br/>
+                       • Backend con base de datos MySQL<br/>
+                       • Integración con Machine Learning para dificultad adaptativa</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Desarrolladores */}
+            <div className="seccion-desarrolladores">
+              <h3>👨‍💻 Equipo de Desarrollo</h3>
+              <div className="devs-grid">
+                <div className="dev-card">
+                  <div className="dev-avatar">👨‍💻</div>
+                  <p className="dev-nombre">Jefferson Pistala</p>
+                  <p className="dev-rol">Frontend Developer</p>
+                </div>
+                <div className="dev-card">
+                  <div className="dev-avatar">👨‍💻</div>
+                  <p className="dev-nombre">Jeremy Yugsi</p>
+                  <p className="dev-rol">Full Stack Developer / Product Owner</p>
+                </div>
+                <div className="dev-card">
+                  <div className="dev-avatar">👨‍💻</div>
+                  <p className="dev-nombre">Kevin Villacis</p>
+                  <p className="dev-rol">Backend Developer</p>
+                </div>
+                <div className="dev-card">
+                  <div className="dev-avatar">👨‍💻</div>
+                  <p className="dev-nombre">Ricardo Villareal</p>
+                  <p className="dev-rol">Frontend Developer</p>
+                </div>
+                <div className="dev-card">
+                  <div className="dev-avatar">👨‍💻</div>
+                  <p className="dev-nombre">Nick Valverde</p>
+                  <p className="dev-rol">Full Stack Developer / Product Owner / ML Engineer</p>
+                </div>
+              </div>
+              <p className="copyright">© 2026 Quiz Racing - Todos los derechos reservados</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
