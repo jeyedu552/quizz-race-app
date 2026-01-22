@@ -63,22 +63,6 @@ function App() {
   const shortTimerRef = useRef(null);
 
 
-  // --- INICIALIZACIÓN DEL JUEGO ---
-  const iniciarJuego = (datosJugadores) => {
-    setInfoJugadores(datosJugadores);
-    setFase("Trivia");
-    cargarPregunta();
-  };
-
-  // Determina el nombre legible del nivel basado en su número
-  const obtenerNombreNivel = (nivelNum) => {
-    if (nivelNum === 1) return "🌱 FÁCIL";
-    if (nivelNum === 2) return "😐 MEDIO";
-    if (nivelNum === 3) return "🔥 DIFÍCIL";
-    if (nivelNum >= 4) return "⚡ EXTREMO";
-    return "NIVEL " + nivelNum;
-  };
-
   // --- EFECTO: VIGILANTE DE LA CARRERA ---
   // Monitorea el progreso de los carros y determina si hay un ganador.
   // Se encarga de asignar los puntos y realizar la transición a la siguiente fase.
@@ -240,6 +224,36 @@ function App() {
     if (nivelNum === 3) return "🔥 DIFÍCIL";
     if (nivelNum >= 4) return "⚡ EXTREMO";
     return "NIVEL " + nivelNum;
+  };
+
+  // Maneja cuando el temporizador principal (30s) se agota
+  const manejarTiempoAgotado = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (shortTimerRef.current) {
+      clearInterval(shortTimerRef.current);
+      shortTimerRef.current = null;
+    }
+    setShortTimer(null);
+    setJugadorActivo(null);
+    setFeedback("Tiempo agotado");
+    setLoadingPregunta(true);
+    setTimeout(() => {
+      setFeedback(null);
+      avanzarSiguientePaso();
+    }, 1500);
+  };
+
+  // Maneja cuando el temporizador corto (3s) se agota
+  const manejarShortTimerAgotado = () => {
+    if (shortTimerRef.current) {
+      clearInterval(shortTimerRef.current);
+      shortTimerRef.current = null;
+    }
+    setShortTimer(null);
+    setJugadorActivo(null);
   };
 
   // Determina el flujo del juego (Siguiente Ronda, Carrera o Fin del Juego)
