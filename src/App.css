@@ -735,8 +735,9 @@ select {
   border: 3px solid #e74c3c;
 }
 .feedback-flotante.tiempo {
-  color: #f39c12;
-  border: 3px solid #f39c12;
+  color: #d97706;        /* Texto Naranja oscuro */
+  border: 3px solid #f59e0b; /* Borde Naranja brillante */
+  background-color: #fffbeb; /* Fondo crema suave */
 }
 .icono-check {
   font-size: 2rem;
@@ -1440,7 +1441,7 @@ select {
 }
 
 /* =========================================
-   6. NUEVA BARRA DE RONDAS 
+   7. NUEVA BARRA DE RONDAS 
    ========================================= */
 
 .hud-central-nuevo {
@@ -1639,4 +1640,115 @@ select {
 /* Ocultar el HUD viejo del centro */
 .centro-info {
   display: none !important;
+}
+
+/* =========================================
+   8. NUEVOS ESTILOS VISTA INICIO (CARRUSEL)
+   ========================================= */
+
+/* --- Controles Arcade (Flechas) --- */
+.controles-arcade {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  background: rgba(0,0,0,0.05);
+  padding: 5px 15px;
+  border-radius: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.controles-arcade label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #a0aec0;
+  letter-spacing: 1px;
+}
+
+.flecha {
+  font-size: 1.2rem;
+  animation: bounceX 1s infinite;
+}
+
+@keyframes bounceX {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+/* --- Botón "Crear Nuevo" Mejorado --- */
+.btn-nuevo-mini {
+  margin-top: 15px;
+  width: 100%;
+  background-color: #fff;
+  color: #4a5568;
+  border: 2px solid #e2e8f0;
+  border-bottom: 4px solid #cbd5e0; /* Efecto 3D */
+  padding: 10px 15px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.btn-nuevo-mini:hover {
+  background-color: #f7fafc;
+  transform: translateY(-1px);
+  border-color: #cbd5e0;
+}
+
+.btn-nuevo-mini:active {
+  transform: translateY(2px);
+  border-bottom-width: 2px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* --- Foco de Selección (Space/Enter) --- */
+.tarjeta-jugador {
+  transition: all 0.3s ease; /* Suavizar el cambio de foco */
+}
+
+.tarjeta-jugador.foco-activo {
+  transform: scale(1.05);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  border: 4px solid #facc15; /* Amarillo brillante */
+  z-index: 10;
+}
+
+.tarjeta-jugador.foco-inactivo {
+  opacity: 0.7;
+  transform: scale(0.95);
+  filter: grayscale(0.4);
+}
+
+/* Hint visual de tecla Espacio */
+.tecla-hint {
+  font-size: 0.7rem;
+  background: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  color: #a0aec0;
+  font-weight: 900;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.footer-inicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.instruccion-arcade {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }

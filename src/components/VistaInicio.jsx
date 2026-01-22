@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ModelLeaderboard from "./modelLeaderboard";
 import { fetchUsuarios, crearUsuario } from "../services/preguntas";
+import { useInputHandler } from "../useInputHandler"; 
 
 // --- IMÁGENES ---
 import batman from "../assets/avatars/batman.png";
@@ -38,8 +39,13 @@ const CODIGOS_DISPONIBLES = Object.keys(DICCIONARIO_AVATARES).filter(
 function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volverDesdeR = false, onUsuariosCargados = null }) {
   const [listaUsuarios, setListaUsuarios] = useState([]);
   const [_cargando, setCargando] = useState(true);
-  const [p1Id, setP1Id] = useState("");
-  const [p2Id, setP2Id] = useState("");
+  
+  // Indices para controlar el carrusel (en lugar de p1Id directo)
+  const [idxP1, setIdxP1] = useState(0);
+  const [idxP2, setIdxP2] = useState(1);
+
+  // Foco para alternar visualmente quién está activo (Space/Enter)
+  const [focoActual, setFocoActual] = useState('p1');
 
   // Modal
   const [mostrarModal, setMostrarModal] = useState(false);
@@ -56,43 +62,101 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
     const usuarios = await fetchUsuarios();
     console.log("Usuarios cargados:", usuarios);
     setListaUsuarios(usuarios);
+    
+    // Si hay usuarios, inicializamos índices seguros
+    if (usuarios.length > 0) {
+        // Intentamos mantener índices si ya existían, sino 0 y 1
+        setIdxP1(0);
+        setIdxP2(usuarios.length > 1 ? 1 : 0);
+    }
+
     setCargando(false);
-    // Si venimos por la tecla R, notificamos al padre que los usuarios ya cargaron
+    // Si venimos por la tecla R, notificamos al padre
     try {
       if (volverDesdeR && typeof onUsuariosCargados === 'function') onUsuariosCargados();
     } catch (e) {
       console.error('Error notificando carga de usuarios:', e);
     }
   };
+  
   useEffect(() => {
     cargarDatos();
   }, []);
 
-  // Si el padre (App) pasa ids iniciales (vienen cuando se vuelve desde GameOver), los usamos
+  // --- LÓGICA DE SINCRONIZACIÓN CON IDs (Volver de GameOver) ---
   useEffect(() => {
-    if (initialP1Id) setP1Id(initialP1Id);
-    if (initialP2Id) setP2Id(initialP2Id);
-  }, [initialP1Id, initialP2Id]);
+    if (listaUsuarios.length === 0) return;
+    
+    // Buscar índice de P1 si viene ID
+    if (initialP1Id) {
+        const foundIndex = listaUsuarios.findIndex(u => u.id_usuario.toString() === initialP1Id);
+        if (foundIndex !== -1) setIdxP1(foundIndex);
+    }
+    // Buscar índice de P2 si viene ID
+    if (initialP2Id) {
+        const foundIndex = listaUsuarios.findIndex(u => u.id_usuario.toString() === initialP2Id);
+        if (foundIndex !== -1) setIdxP2(foundIndex);
+    }
+  }, [initialP1Id, initialP2Id, listaUsuarios]);
 
-  // Efecto para seleccionar automáticamente al usuario recién creado
+
+  // --- LÓGICA DE USUARIO RECIÉN CREADO ---
   useEffect(() => {
     if (ultimoUsuarioCreado && listaUsuarios.length > 0) {
-      const usuarioEncontrado = listaUsuarios.find(u => u.nickname === ultimoUsuarioCreado.nombre);
-      if (usuarioEncontrado) {
-        const idStr = usuarioEncontrado.id_usuario.toString();
+      const indexEncontrado = listaUsuarios.findIndex(u => u.nickname === ultimoUsuarioCreado.nombre);
+      
+      if (indexEncontrado !== -1) {
         if (ultimoUsuarioCreado.jugador === 'p1') {
-          setP1Id(idStr);
+          setIdxP1(indexEncontrado);
         } else {
-          setP2Id(idStr);
+          setIdxP2(indexEncontrado);
         }
-        // Limpiamos el estado para que no se vuelva a ejecutar
         setUltimoUsuarioCreado(null);
       }
     }
   }, [listaUsuarios, ultimoUsuarioCreado]);
 
-  const usuarioP1 = listaUsuarios.find((u) => u.id_usuario.toString() === p1Id);
-  const usuarioP2 = listaUsuarios.find((u) => u.id_usuario.toString() === p2Id);
+  // Helpers para obtener el objeto usuario actual
+  const usuarioP1 = listaUsuarios[idxP1];
+  const usuarioP2 = listaUsuarios[idxP2];
+
+  // --- LÓGICA DE CARRUSEL ---
+  const cambiarJugador = (jugador, direccion) => {
+    if (listaUsuarios.length === 0) return;
+
+    if (jugador === 'p1') {
+        setIdxP1(prev => {
+            let nuevo = prev + direccion;
+            if (nuevo < 0) nuevo = listaUsuarios.length - 1;
+            if (nuevo >= listaUsuarios.length) nuevo = 0;
+            return nuevo;
+        });
+    } else {
+        setIdxP2(prev => {
+            let nuevo = prev + direccion;
+            if (nuevo < 0) nuevo = listaUsuarios.length - 1;
+            if (nuevo >= listaUsuarios.length) nuevo = 0;
+            return nuevo;
+        });
+    }
+  };
+
+  // --- MAPEO DE CONTROLES ARCADE ---
+  useInputHandler({
+    // JUGADOR 1: Solo si foco es P1
+    onRed: () => { if (focoActual === 'p1') cambiarJugador('p1', -1); },
+    onBlue: () => { if (focoActual === 'p1') cambiarJugador('p1', 1); },
+    
+    // JUGADOR 2: Solo si foco es P2
+    onGreen: () => { if (focoActual === 'p2') cambiarJugador('p2', -1); },
+    onYellow: () => { if (focoActual === 'p2') cambiarJugador('p2', 1); },
+
+    // BOTÓN GRANDE: Alternar foco
+    onBigButton: () => {
+       setFocoActual(prev => prev === 'p1' ? 'p2' : 'p1');
+    }
+  });
+
 
   const manejarGuardarNuevo = async () => {
     if (!nuevoNombre.trim()) return alert("¡Escribe un nombre!");
@@ -100,10 +164,9 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
       const respuestaAPI = await crearUsuario(nuevoNombre, nuevoAvatar);
 
       if (respuestaAPI) {
-        // Guardamos el nombre y para quién se creó, para usarlo en el useEffect
         setUltimoUsuarioCreado({ nombre: nuevoNombre, jugador: creandoPara });
         cerrarModal();
-        await cargarDatos(); // Esto disparará el useEffect de arriba
+        await cargarDatos(); 
       } else {
         alert("No se pudo crear el usuario. Revisa el backend.");
       }
@@ -121,10 +184,9 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
   };
 
   const cerrarModal = () => {
-    console.log("Cerrando modal");
     setMostrarModal(false);
     setCreandoPara(null);
-    setNuevoNombre(""); // Limpiamos el nombre al cerrar
+    setNuevoNombre(""); 
   };
 
   const manejarInicioJuego = () => {
@@ -146,7 +208,7 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
     });
   };
 
-  // Atajo de teclado: 'p' para iniciar partida (si los jugadores están seleccionados)
+  // Atajo de teclado 'P' (Opcional, se mantiene por compatibilidad)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.repeat) return;
@@ -156,11 +218,11 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [p1Id, p2Id, listaUsuarios]);
+  }, [usuarioP1, usuarioP2]); // Dependemos de los usuarios seleccionados
 
   return (
     <div className="contenedor-inicio">
-      {/* Overlay cuando volvemos desde R y se están cargando los usuarios */}
+      {/* Overlay carga */}
       {volverDesdeR && _cargando && (
         <div className="modal-fondo">
           <div className="modal-caja">
@@ -181,30 +243,19 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
       </header>
 
       <main className="area-seleccion">
-        {/* JUGADOR 1 (ROSA) */}
-        <div className="tarjeta-jugador rosa">
-          <div className="etiqueta-jugador">JUGADOR 1</div>
+        
+        {/* JUGADOR 1 (ROSA) - CON LÓGICA DE FOCO Y CARRUSEL */}
+        <div className={`tarjeta-jugador rosa ${focoActual === 'p1' ? 'foco-activo' : 'foco-inactivo'}`}>
+          <div className="etiqueta-jugador">
+             {focoActual === 'p1' ? '👉 JUGADOR 1 👈' : 'JUGADOR 1'}
+          </div>
 
           <div className="contenido-tarjeta">
-            <label>Selecciona Piloto:</label>
-            <div className="fila-input">
-              <select value={p1Id} onChange={(e) => setP1Id(e.target.value)}>
-                <option disabled value="">
-                  Elegir...
-                </option>
-                {listaUsuarios.map((u) => (
-                  <option key={u.id_usuario} value={u.id_usuario}>
-                    {u.nickname}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => abrirModal("p1")}
-                className="btn-nuevo rosa"
-                title="Crear Nuevo"
-              >
-                +
-              </button>
+            {/* Controles Visuales */}
+            <div className="controles-arcade" style={{ opacity: focoActual === 'p1' ? 1 : 0.3 }}>
+                <div className="flecha">🔴</div>
+                <label>SELECCIONA</label>
+                <div className="flecha">🔵</div>
             </div>
 
             <div className="area-avatar rosa">
@@ -228,36 +279,30 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
                 </div>
               )}
             </div>
+            
+            <button onClick={() => abrirModal("p1")} className="btn-nuevo-mini">
+               Crear Nuevo (+)
+            </button>
           </div>
         </div>
 
         {/* VS */}
-        <div className="vs-central">VS</div>
+        <div className="vs-central">
+             VS
+        </div>
 
-        {/* JUGADOR 2 (VERDE) */}
-        <div className="tarjeta-jugador verde">
-          <div className="etiqueta-jugador">JUGADOR 2</div>
+        {/* JUGADOR 2 (VERDE) - CON LÓGICA DE FOCO Y CARRUSEL */}
+        <div className={`tarjeta-jugador verde ${focoActual === 'p2' ? 'foco-activo' : 'foco-inactivo'}`}>
+          <div className="etiqueta-jugador">
+             {focoActual === 'p2' ? '👉 JUGADOR 2 👈' : 'JUGADOR 2'}
+          </div>
 
           <div className="contenido-tarjeta">
-            <label>Selecciona Piloto:</label>
-            <div className="fila-input">
-              <select value={p2Id} onChange={(e) => setP2Id(e.target.value)}>
-                <option disabled value="">
-                  Elegir...
-                </option>
-                {listaUsuarios.map((u) => (
-                  <option key={u.id_usuario} value={u.id_usuario}>
-                    {u.nickname}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => abrirModal("p2")}
-                className="btn-nuevo verde"
-                title="Crear Nuevo"
-              >
-                +
-              </button>
+             {/* Controles Visuales */}
+             <div className="controles-arcade" style={{ opacity: focoActual === 'p2' ? 1 : 0.3 }}>
+                <div className="flecha">🟢</div>
+                <label>SELECCIONA</label>
+                <div className="flecha">🟡</div>
             </div>
 
             <div className="area-avatar verde">
@@ -281,26 +326,33 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
                 </div>
               )}
             </div>
+
+            <button onClick={() => abrirModal("p2")} className="btn-nuevo-mini">
+              Crear Nuevo (+)
+            </button>
           </div>
         </div>
       </main>
 
-      <button
-        onClick={manejarInicioJuego}
-        className={`btn-comenzar ${!usuarioP1 || !usuarioP2 ? "deshabilitado" : ""}`}
-        disabled={!usuarioP1 || !usuarioP2}
-      >
-        ¡A CORRER! 🏁
-      </button>
-
-      {/* Botón Leaderboard */}
-      <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
-        <button className="btn-leaderboard" onClick={() => setModalBoard(true)}>
-          Leaderboard
+      <div className="footer-inicio">
+        <p className="instruccion-arcade">USA BOTONES DE COLORES PARA CAMBIAR • BOTÓN GRANDE PARA ALTERNAR</p>
+        <button
+          onClick={manejarInicioJuego}
+          className={`btn-comenzar ${!usuarioP1 || !usuarioP2 ? "deshabilitado" : ""}`}
+          disabled={!usuarioP1 || !usuarioP2}
+        >
+          ¡A CORRER! 🏁
         </button>
       </div>
 
-      {/* MODAL */}
+      {/* Botón Leaderboard (NO LO ELIMINÉ) */}
+      <div style={{ marginTop: 16, display: "flex", justifyContent: "center" }}>
+        <button className="btn-leaderboard" onClick={() => setModalBoard(true)}>
+          🏆 Leaderboard
+        </button>
+      </div>
+
+      {/* MODAL CREAR USUARIO (Igual que antes) */}
       {mostrarModal && (
         <div className="modal-fondo">
           <div className="modal-caja">
@@ -339,7 +391,7 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
         </div>
       )}
 
-      {/* Modal Leaderboard */}
+      {/* Modal Leaderboard (Igual que antes) */}
       {modalBoard && (
         <ModelLeaderboard
           usuarios={listaUsuarios}

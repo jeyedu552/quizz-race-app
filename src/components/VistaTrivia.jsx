@@ -148,10 +148,12 @@ function VistaTrivia({
             </div>
           </div>
         )}
-        {feedback === 'Tiempo' && (
+        {feedback && feedback.includes("Tiempo") && (
           <div className="feedback-flotante tiempo">
             <div className="icono-check">⏱️</div>
-            <div className="texto-feedback"><span className="titulo-feed">¡TIEMPO!</span></div>
+            <div className="texto-feedback">
+                <span className="titulo-feed">¡TIEMPO AGOTADO!</span>
+            </div>
           </div>
         )}
 
