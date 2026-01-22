@@ -243,13 +243,13 @@ function VistaTrivia({
             {pregunta?.opcion_a || pregunta?.Opcion_A}
           </div>
           <div 
-            className={`opcion azul ${respuestaSeleccionada?.letra === 'B' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'B' ? 'correcta-mostrar' : ''}`} 
+            className={`opcion verde ${respuestaSeleccionada?.letra === 'B' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'B' ? 'correcta-mostrar' : ''}`} 
             data-letra="B"
           >
             {pregunta?.opcion_b || pregunta?.Opcion_B}
           </div>
           <div 
-            className={`opcion verde ${respuestaSeleccionada?.letra === 'C' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'C' ? 'correcta-mostrar' : ''}`} 
+            className={`opcion azul ${respuestaSeleccionada?.letra === 'C' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'C' ? 'correcta-mostrar' : ''}`} 
             data-letra="C"
           >
             {pregunta?.opcion_c || pregunta?.Opcion_C}

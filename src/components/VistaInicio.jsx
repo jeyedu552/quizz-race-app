@@ -145,10 +145,10 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
   useInputHandler({
     // JUGADOR 1: Solo si foco es P1
     onRed: () => { if (focoActual === 'p1') cambiarJugador('p1', -1); },
-    onBlue: () => { if (focoActual === 'p1') cambiarJugador('p1', 1); },
+    onGreen: () => { if (focoActual === 'p1') cambiarJugador('p1', 1); },
     
     // JUGADOR 2: Solo si foco es P2
-    onGreen: () => { if (focoActual === 'p2') cambiarJugador('p2', -1); },
+    onBlue: () => { if (focoActual === 'p2') cambiarJugador('p2', -1); },
     onYellow: () => { if (focoActual === 'p2') cambiarJugador('p2', 1); },
 
     // BOTÓN GRANDE: Alternar foco

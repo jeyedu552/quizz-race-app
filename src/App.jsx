@@ -413,7 +413,7 @@ function App() {
         if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
         if (shortTimerRef.current) { clearInterval(shortTimerRef.current); shortTimerRef.current = null; }
 
-        // 🔓 IMPORTANTE: ABRIR EL CANDADO AL REINICIAR
+        // 🔓IMPORTANTE: ABRIR EL CANDADO AL REINICIAR
         isFetchingRef.current = false;
 
         setPreguntaActual(null);

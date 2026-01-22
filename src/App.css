@@ -709,6 +709,7 @@ select {
     var(--primary),
     var(--btn-azul),
     var(--btn-amarillo)
+  
   );
 }
 .pregunta-card h2 {
@@ -828,7 +829,7 @@ select {
 /* Feedback */
 .feedback-flotante {
   position: fixed;
-  top: 250px;
+  top: 290px;
   left: 50%;
   transform: translateX(-50%);
   background: white;
@@ -1552,7 +1553,7 @@ select {
    ========================================= */
 .short-timer-banner {
   position: fixed;
-  top: 250px; /* antes: 0 */
+  top: 300px; /* antes: 0 */
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
