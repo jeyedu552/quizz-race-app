@@ -16,11 +16,15 @@ function VistaTrivia({
   jugadores,
   ronda,
   shortTimer,
-  nivelNombre 
+  nivelNombre,
+  usaIA
 }) {
 
   const totalRondas = Array.from({ length: 10 }, (_, i) => i + 1);
   const porcentajeProgreso = Math.min(((ronda - 1) / 9) * 100, 100);
+
+  // El toggle de IA se activa solo si usaIA es true Y el nivel NO es fácil
+  const iaActiva = usaIA && nivelNombre && !nivelNombre.includes('FÁCIL');
 
   return (
     <div className={`game-container ${feedback ? feedback.toLowerCase() : ''}`}>
@@ -54,6 +58,15 @@ function VistaTrivia({
           {nivelNombre && (
              <div className="nivel-badge">{nivelNombre}</div>
           )}
+
+          {/* Toggle de IA */}
+          <div className={`toggle-ia ${iaActiva ? 'activado' : 'desactivado'}`}>
+            <div className="toggle-icono">✨</div>
+            <span className="toggle-texto">
+              {iaActiva ? 'IA activada' : 'IA desactivada'}
+            </span>
+            <div className="toggle-circulo"></div>
+          </div>
 
           <span className="label-rondas">Rondas</span>
           

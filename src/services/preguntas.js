@@ -1,4 +1,4 @@
-const DEFAULT_HOST = "172.29.81.0:5000";
+const DEFAULT_HOST = "192.168.100.112:5000";
 const IP = import.meta.env?.VITE_API_HOST ?? DEFAULT_HOST;
 const ENDPOINT_PREGUNTA_FACIL = `http://${IP}/preguntafacil`;
 const ENDPOINT_PREGUNTA = `http://${IP}/predecir`;

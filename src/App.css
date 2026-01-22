@@ -576,6 +576,68 @@ select {
   z-index: 10;
   transform: translateY(5px); /* Ajuste fino de posición */
 }
+
+/* Toggle de IA */
+.toggle-ia {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 3px solid #e5e7eb;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.toggle-ia.desactivado {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+}
+
+.toggle-ia.activado {
+  background-color: #2bee8c;
+  color: white;
+  border-color: #2bee8c;
+  box-shadow: 0 4px 10px rgba(43, 238, 140, 0.3);
+}
+
+.toggle-icono {
+  font-size: 1rem;
+}
+
+.toggle-texto {
+  white-space: nowrap;
+}
+
+.toggle-circulo {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.6;
+}
+
+.toggle-ia.activado .toggle-circulo {
+  background-color: white;
+  opacity: 1;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 /*.timer-reloj {
   width: 90px;
   height: 90px;
