@@ -19,7 +19,8 @@ function VistaTrivia({
   shortTimer,
   nivelNombre,
   usaIA,
-  aciertosSeguidos
+  aciertosSeguidos,
+  respuestaSeleccionada
 }) {
 
   const totalRondas = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -235,10 +236,30 @@ function VistaTrivia({
         </div>
 
         <div className={`opciones-grid ${!jugadorActivo ? 'disabled' : ''}`}>
-          <div className="opcion roja" data-letra="A">{pregunta?.opcion_a || pregunta?.Opcion_A}</div>
-          <div className="opcion azul" data-letra="B">{pregunta?.opcion_b || pregunta?.Opcion_B}</div>
-          <div className="opcion verde" data-letra="C">{pregunta?.opcion_c || pregunta?.Opcion_C}</div>
-          <div className="opcion amarilla" data-letra="D">{pregunta?.opcion_d || pregunta?.Opcion_D}</div>
+          <div 
+            className={`opcion roja ${respuestaSeleccionada?.letra === 'A' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'A' ? 'correcta-mostrar' : ''}`} 
+            data-letra="A"
+          >
+            {pregunta?.opcion_a || pregunta?.Opcion_A}
+          </div>
+          <div 
+            className={`opcion azul ${respuestaSeleccionada?.letra === 'B' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'B' ? 'correcta-mostrar' : ''}`} 
+            data-letra="B"
+          >
+            {pregunta?.opcion_b || pregunta?.Opcion_B}
+          </div>
+          <div 
+            className={`opcion verde ${respuestaSeleccionada?.letra === 'C' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'C' ? 'correcta-mostrar' : ''}`} 
+            data-letra="C"
+          >
+            {pregunta?.opcion_c || pregunta?.Opcion_C}
+          </div>
+          <div 
+            className={`opcion amarilla ${respuestaSeleccionada?.letra === 'D' ? (respuestaSeleccionada.correcta ? 'correcta-seleccionada' : 'incorrecta-seleccionada') : ''} ${respuestaSeleccionada && !respuestaSeleccionada.correcta && respuestaSeleccionada.letraCorrecta === 'D' ? 'correcta-mostrar' : ''}`} 
+            data-letra="D"
+          >
+            {pregunta?.opcion_d || pregunta?.Opcion_D}
+          </div>
         </div>
       </div>
     </div>

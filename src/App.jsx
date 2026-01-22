@@ -40,6 +40,7 @@ function App() {
   });
 
   const [jugadorActivo, setJugadorActivo] = useState(null);
+  const [respuestaSeleccionada, setRespuestaSeleccionada] = useState(null); // { letra: 'A', correcta: true/false, respuestaCorrecta: 'B' }
 
   // --- ESTADOS DE CONTROL VISUAL Y TIEMPO ---
   const [timer, setTimer] = useState(30);
@@ -326,6 +327,20 @@ function App() {
 
     const esCorrecto = textoUsuario === respuestaReal;
 
+    // Encontrar la letra de la respuesta correcta
+    let letraCorrecta = null;
+    if (respuestaReal === (preguntaActual.Opcion_A || preguntaActual.opcion_a)) letraCorrecta = 'A';
+    else if (respuestaReal === (preguntaActual.Opcion_B || preguntaActual.opcion_b)) letraCorrecta = 'B';
+    else if (respuestaReal === (preguntaActual.Opcion_C || preguntaActual.opcion_c)) letraCorrecta = 'C';
+    else if (respuestaReal === (preguntaActual.Opcion_D || preguntaActual.opcion_d)) letraCorrecta = 'D';
+
+    // Guardar la selección del jugador
+    setRespuestaSeleccionada({
+      letra: letraUsuario,
+      correcta: esCorrecto,
+      letraCorrecta: letraCorrecta
+    });
+
     // Actualizar aciertos seguidos (solo en primeras 5 rondas)
     if (rondaRef.current <= 5) {
       if (esCorrecto) {
@@ -351,6 +366,7 @@ function App() {
     setFeedback(esCorrecto ? "Correcto" : "Incorrecto");
     setTimeout(() => {
       setFeedback(null);
+      setRespuestaSeleccionada(null);
       setLoadingPregunta(true);
       avanzarSiguientePaso();
     }, 1500);
@@ -459,6 +475,7 @@ function App() {
       ronda={ronda}
       usaIA={usaIA}
       aciertosSeguidos={aciertosSeguidos}
+      respuestaSeleccionada={respuestaSeleccionada}
       nivelNombre={
         preguntaActual
           ? obtenerNombreNivel(preguntaActual.Nivel || preguntaActual.nivel)
