@@ -157,7 +157,7 @@ function App() {
         aciertos_pct_ult5: porcentajeAsertividad,
         ID_seleccionados: idsUsados,
       };
-
+      console.log("Cargando pregunta para Ronda:", rondaActual);
       console.log("Enviando métricas a IA:", datosParaEnviar);
 
       // 2. Se solicita la predicción al servicio
