@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import botonRojoGif from '../assets/boton-rojo.gif';
 
 // Icono simple de check
 const CheckIcon = () => (
@@ -223,10 +224,14 @@ function VistaTrivia({
           </div>
         )}
 
-        <div className="pregunta-card">
-          <h2>
-            {pregunta ? (pregunta.pregunta || pregunta.Pregunta) : "Cargando..."}
-          </h2>
+        <div className="pregunta-container-con-botones">
+          <img src={botonRojoGif} alt="boton" className="boton-gif-izquierdo" />
+          <div className="pregunta-card">
+            <h2>
+              {pregunta ? (pregunta.pregunta || pregunta.Pregunta) : "Cargando..."}
+            </h2>
+          </div>
+          <img src={botonRojoGif} alt="boton" className="boton-gif-derecho" />
         </div>
 
         <div className={`opciones-grid ${!jugadorActivo ? 'disabled' : ''}`}>
