@@ -535,10 +535,11 @@ function VistaInicio({ onIniciar, initialP1Id = null, initialP2Id = null, volver
                     <strong>Controles del Teclado</strong>
                     <p>• <kbd>Botón Rojo</kbd>: Botón grande P1 (buzz in / acelerar)<br/>
                        • <kbd>Botón Rojo</kbd>: Botón grande P2 (buzz in / acelerar)<br/>
-                       • <kbd>A</kbd>: Respuesta A (Rojo 🔴)<br/>
-                       • <kbd>B</kbd>: Respuesta B (Azul 🔵)<br/>
-                       • <kbd>C</kbd>: Respuesta C (Verde 🟢)<br/>
-                       • <kbd>D</kbd>: Respuesta D (Amarillo 🟡)<br/>
+                       • <kbd>1</kbd>: Respuesta A (Rojo 🔴)<br/>
+                       • <kbd>2</kbd>: Respuesta B (Azul 🔵)<br/>
+                       • <kbd>3</kbd>: Respuesta C (Verde 🟢)<br/>
+                       • <kbd>4</kbd>: Respuesta D (Amarillo 🟡)<br/>
+                       • <kbd>P</kbd>: Iniciar el juego<br/>
                        • <kbd>R</kbd>: Reiniciar juego desde cualquier pantalla</p>
                   </div>
                 </div>
