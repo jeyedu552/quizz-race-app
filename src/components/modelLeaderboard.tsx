@@ -45,7 +45,7 @@ const ModelLeaderboard: React.FC<Props> = ({ usuarios, onClose }) => {
           }}
         >
           <h2 style={{ margin: 0, fontSize: "clamp(1.2rem, 4vw, 1.8rem)" }}>
-            🏆 Leaderboard
+            🏆 Historial de Puntos
           </h2>
 
           <button

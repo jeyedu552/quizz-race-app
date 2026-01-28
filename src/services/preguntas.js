@@ -1,12 +1,12 @@
-const DEFAULT_HOST = "172.29.81.0:5000";
-const IP = import.meta.env?.VITE_API_HOST ?? DEFAULT_HOST;
-const ENDPOINT_PREGUNTA_FACIL = `http://${IP}/preguntafacil`;
-const ENDPOINT_PREGUNTA = `http://${IP}/predecir`;
-const ENDPOINT_FACILES = `http://${IP}/cargarFaciles`;
-const ENDPOINT_USUARIOS = `http://${IP}/usuarios`; //Para listar
-const ENDPOINT_CREAR_USUARIO = `http://${IP}/usuariosCrear`; // Para guardar nuevo
-const ENDPOINT_GUARDAR_PUNTAJE = `http://${IP}/guardarPuntaje`; // Para guardar el puntaje
-const ENDPOINT_CARGAR_PUNTAJE = `http://${IP}/cargarpuntaje`; // Para cargar el puntaje
+const IP = "back-quizzrace.onrender.com";
+//-const IP = import.meta.env?.VITE_API_HOST ?? DEFAULT_HOST;
+const ENDPOINT_PREGUNTA_FACIL = `https://${IP}/preguntafacil`;
+const ENDPOINT_PREGUNTA = `https://${IP}/predecir`;
+const ENDPOINT_FACILES = `https://${IP}/cargarFaciles`;
+const ENDPOINT_USUARIOS = `https://${IP}/usuarios`; //Para listar
+const ENDPOINT_CREAR_USUARIO = `https://${IP}/usuariosCrear`; // Para guardar nuevo
+const ENDPOINT_GUARDAR_PUNTAJE = `https://${IP}/guardarPuntaje`; // Para guardar el puntaje
+const ENDPOINT_CARGAR_PUNTAJE = `https://${IP}/cargarpuntaje`; // Para cargar el puntaje
 
 //Lógica para traer pregunta fácil
 export const fetchPreguntaFacil = async () => {

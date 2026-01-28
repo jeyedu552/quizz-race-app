@@ -1,8 +1,18 @@
 import React, { useEffect, useRef } from "react";
 import { fetchCargarPuntaje } from "./../services/preguntas";
 
-function VistaGameOver({ stats, jugadores }) {
+function VistaGameOver({ stats, jugadores, onVolverInicio }) {
   const puntajeGuardado = useRef(false);
+
+  const cargarDatosPuntaje = async () => {
+    const resultado = await fetchCargarPuntaje(
+      jugadores.p1.id_usuario,
+      stats.p1.puntos,
+      jugadores.p2.id_usuario,
+      stats.p2.puntos,
+    );
+    console.log("Resultado de cargar puntaje:", resultado);
+  };
 
   useEffect(() => {
     console.log("VistaGameOver montada");
@@ -15,17 +25,7 @@ function VistaGameOver({ stats, jugadores }) {
       puntajeGuardado.current = true;
       cargarDatosPuntaje();
     }
-  }, []);
-
-  const cargarDatosPuntaje = async () => {
-    const resultado = await fetchCargarPuntaje(
-      jugadores.p1.id_usuario,
-      stats.p1.puntos,
-      jugadores.p2.id_usuario,
-      stats.p2.puntos,
-    );
-    console.log("Resultado de cargar puntaje:", resultado);
-  };
+  }, [cargarDatosPuntaje, jugadores, stats]);
 
   // Lógica para determinar ganador y perdedor
   let ganadorData, perdedorData;
@@ -68,7 +68,7 @@ function VistaGameOver({ stats, jugadores }) {
         <div className="icon-btn text-primary">
           <span className="material-symbols-outlined">pets</span>
         </div>
-        <button className="icon-btn" onClick={() => window.location.reload()}>
+        <button className="icon-btn" onClick={() => (onVolverInicio ? onVolverInicio() : window.location.reload())}>
           <span className="material-symbols-outlined">home</span>
         </button>
       </header>
@@ -162,15 +162,18 @@ function VistaGameOver({ stats, jugadores }) {
           </div>
         </div>
 
+        {/* Mensaje para volver a jugar con la tecla R */}
+        <p style={{ textAlign: 'center', marginTop: 12, color: '#fff' }}>Presiona R si quieres volver a jugar</p>
+
         {/* Botón Jugar Otra Vez */}
-        <button className="btn-replay" onClick={() => window.location.reload()}>
+        <button className="btn-replay" onClick={() => (onVolverInicio ? onVolverInicio() : window.location.reload())}>
           <span
             className="material-symbols-outlined"
             style={{ fontSize: "2rem" }}
           >
             replay
           </span>
-          JUGAR OTRA VEZ
+          JUGAR OTRA Vez
         </button>
       </div>
     </div>
